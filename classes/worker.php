@@ -78,5 +78,12 @@
 	        }
 	        return false;
 	    }
+
+	    public function count_workers(){
+    		$count = "SELECT COUNT(*) AS total FROM worker";
+    		$prep = $this -> pdo -> prepare($count);
+    		$prep -> execute();
+    		return $prep -> fetch();
+}
 	}
 ?>

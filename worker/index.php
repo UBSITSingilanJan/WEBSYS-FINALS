@@ -24,14 +24,13 @@
 
 <div class="dashboard">
 
-    <!-- Sidebar -->
+    
     <aside class="sidebar">
 
         <h3>Financial Aid System</h3>
 
         <a href="index.php" class="active">Dashboard</a>
-        <!-- <a href="#applicants">Applicants</a>
-        <a href="#benefits">Benefits</a> -->
+    
         <a href="logout.php">Logout</a>
 
     </aside>

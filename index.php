@@ -6,15 +6,15 @@
 	<title>Barangay Portal - Login</title>
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
 	
-	<!-- Link to your CSS file -->
+	
 	<link href="styles.css" rel="stylesheet">
 </head>
 <body class="bg-light">
 
-	<!-- Container to center the login card -->
+	
 	<div class="container min-vh-100 d-flex justify-content-center align-items-center">
 		
-		<!-- The Card (logo is injected via CSS) -->
+
 		<div class="card border-0" style="max-width: 400px; width: 100%;">
 			<div class="card-body p-4 p-md-5">
 

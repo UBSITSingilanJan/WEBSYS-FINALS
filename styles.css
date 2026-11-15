@@ -1,18 +1,15 @@
-/* =========================================
-   1. SHARED BACKGROUND & LAYOUT
-   ========================================= */
+
 body.bg-light, 
 body {
     background-image: linear-gradient(rgba(11, 61, 107, 0.7), rgba(11, 61, 107, 0.7)), url('background.png');
     background-size: 120% auto; 
     background-attachment: fixed;
     background-repeat: no-repeat;
-    
-    /* Background Animation (Synced across pages) */
+  
     animation: slideBackground 25s ease-in-out infinite alternate;
     animation-delay: var(--scroll-time, 0s); 
 
-    /* Flexbox for centering */
+
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -27,9 +24,6 @@ body {
     100% { background-position: 100% center; }
 }
 
-/* =========================================
-   2. LOGIN PAGE (From your CSS)
-   ========================================= */
 .card.border-0 {
     position: relative;
     margin-top: 50px; 
@@ -38,7 +32,7 @@ body {
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
     overflow: visible; 
     width: 100%;
-    max-width: 400px; /* Limits width */
+    max-width: 400px; 
 }
 
 .card.border-0::before {
@@ -47,8 +41,8 @@ body {
     top: -50px; 
     left: 50%;
     transform: translateX(-50%);
-    width: 100px;
-    height: 100px;
+    width: 150px;
+    height: 150px;
     background-image: url('logo.jpg'); 
     background-size: cover;
     background-position: center;
@@ -90,9 +84,6 @@ a.text-decoration-none:hover {
     text-decoration: underline;
 }
 
-/* =========================================
-   3. REGISTER PAGE (From the new fix)
-   ========================================= */
 h1 {
     color: #ffffff;
     font-size: 26px;
@@ -114,7 +105,7 @@ body > form {
     margin-bottom: 50px;
 }
 
-/* Floating Logo for Register */
+
 body > form::before {
    
     background-size: cover;
@@ -151,7 +142,7 @@ input[type="password"]:focus {
     box-shadow: 0 0 0 3px rgba(11, 61, 107, 0.25);
 }
 
-/* Raw Buttons & Links (Register) */
+
 button, a {
     flex: 1;
     padding: 12px;

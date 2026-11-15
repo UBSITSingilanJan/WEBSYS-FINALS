@@ -47,7 +47,7 @@ class Beneficiary {
         return $prep->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    // Delon uses this in the assessment page
+    
     public function has_received($resident_id) {
         $prep = $this->pdo->prepare(
             "SELECT COUNT(*) FROM aid_distribution WHERE resident_id = :id"

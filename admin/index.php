@@ -123,12 +123,12 @@
                                     </td>
 
                                     <td>
-                                        <a href="update.php?id=<?php echo urlencode($row['worker_id']); ?>"
+                                        <a href="update.php?id=<?php echo urlencode($row['user_id']); ?>"
                                            class="open-record-btn" style="margin-right: 6px;">
                                             Update
                                         </a>
 
-                                        <a href="delete.php?id=<?php echo urlencode($row['worker_id']); ?>"
+                                        <a href="delete.php?id=<?php echo urlencode($row['user_id']); ?>"
                                            class="open-record-btn"
                                            onclick="return confirm('Are you sure you want to delete this worker?');"
                                            style="background: #dc2626;">

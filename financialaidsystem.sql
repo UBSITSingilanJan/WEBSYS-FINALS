@@ -33,16 +33,18 @@ CREATE TABLE `application` (
   `middlename` varchar(100) NOT NULL,
   `lastname` varchar(100) NOT NULL,
   `email` varchar(100) NOT NULL,
-  `aid_type` enum('Financial Aid','Scholarship') NOT NULL
+  `aid_type` enum('Financial Aid','Scholarship') NOT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `status` varchar(20) NOT NULL DEFAULT 'Pending'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `application`
 --
 
-INSERT INTO `application` (`applicant_id`, `firstname`, `middlename`, `lastname`, `email`, `aid_type`) VALUES
-(6, 'Jan', 'B', 'Singilan', 'jansingilan@gmail.com', 'Financial Aid'),
-(7, 'Chris', 'T', 'Offer', 'christoffer@gmail.com', 'Scholarship');
+INSERT INTO `application` (`applicant_id`, `firstname`, `middlename`, `lastname`, `email`, `aid_type`, `user_id`, `status`) VALUES
+(6, 'Jan', 'B', 'Singilan', 'jansingilan@gmail.com', 'Financial Aid', 1, 'Pending'),
+(7, 'Chris', 'T', 'Offer', 'christoffer@gmail.com', 'Scholarship', NULL, 'Pending');
 
 -- --------------------------------------------------------
 
@@ -81,42 +83,23 @@ CREATE TABLE `user` (
   `firstname` varchar(100) NOT NULL,
   `lastname` varchar(100) NOT NULL,
   `email` varchar(100) NOT NULL,
-  `password` varchar(100) NOT NULL
+  `password` varchar(255) NOT NULL,
+  `contact` varchar(11) DEFAULT NULL,
+  `address` varchar(100) DEFAULT NULL,
+  `position` enum('Barangay Captain','Kagawad','Secretary') DEFAULT NULL,
+  `role` enum('resident','worker') NOT NULL DEFAULT 'resident'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `user`
 --
 
-INSERT INTO `user` (`user_id`, `firstname`, `lastname`, `email`, `password`) VALUES
-(1, 'Jan', 'Singilan', 'jansingilan@gmail.com', '123'),
-(2, 'Janelle', 'Sambahon', 'janellesambahon@gmail.com', '123'),
-(3, 'Marc', 'Soledad', 'marcsoledad@gmail.com', '123'),
-(4, 'Sir', 'Pogi', 'sirpogi@gmail.com', '123');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `worker`
---
-
-CREATE TABLE `worker` (
-  `worker_id` int(11) NOT NULL,
-  `firstname` varchar(100) NOT NULL,
-  `lastname` varchar(100) NOT NULL,
-  `email` varchar(100) NOT NULL,
-  `contact` varchar(11) NOT NULL,
-  `password` varchar(100) NOT NULL,
-  `address` varchar(100) NOT NULL,
-  `position` enum('Barangay Captain','Kagawad','Secretary') NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `worker`
---
-
-INSERT INTO `worker` (`worker_id`, `firstname`, `lastname`, `email`, `contact`, `password`, `address`, `position`) VALUES
-(6, 'Cristina', 'Peridot', 'cristinaperido@gmail.com', '09876754321', '123', 'Trancoville', 'Secretary');
+INSERT INTO `user` (`user_id`, `firstname`, `lastname`, `email`, `password`, `contact`, `address`, `position`, `role`) VALUES
+(1, 'Jan', 'Singilan', 'jansingilan@gmail.com', '123', NULL, NULL, NULL, 'resident'),
+(2, 'Janelle', 'Sambahon', 'janellesambahon@gmail.com', '123', NULL, NULL, NULL, 'resident'),
+(3, 'Marc', 'Soledad', 'marcsoledad@gmail.com', '123', NULL, NULL, NULL, 'resident'),
+(4, 'Sir', 'Pogi', 'sirpogi@gmail.com', '123', NULL, NULL, NULL, 'resident'),
+(5, 'Cristina', 'Peridot', 'cristinaperido@gmail.com', '123', '09876754321', 'Trancoville', 'Secretary', 'worker');
 
 --
 -- Indexes for dumped tables
@@ -126,7 +109,8 @@ INSERT INTO `worker` (`worker_id`, `firstname`, `lastname`, `email`, `contact`, 
 -- Indexes for table `application`
 --
 ALTER TABLE `application`
-  ADD PRIMARY KEY (`applicant_id`);
+  ADD PRIMARY KEY (`applicant_id`),
+  ADD KEY `application_user_id` (`user_id`);
 
 --
 -- Indexes for table `resident_information`
@@ -138,13 +122,8 @@ ALTER TABLE `resident_information`
 -- Indexes for table `user`
 --
 ALTER TABLE `user`
-  ADD PRIMARY KEY (`user_id`);
-
---
--- Indexes for table `worker`
---
-ALTER TABLE `worker`
-  ADD PRIMARY KEY (`worker_id`);
+  ADD PRIMARY KEY (`user_id`),
+  ADD UNIQUE KEY `unique_email` (`email`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -166,13 +145,7 @@ ALTER TABLE `resident_information`
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
-
---
--- AUTO_INCREMENT for table `worker`
---
-ALTER TABLE `worker`
-  MODIFY `worker_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

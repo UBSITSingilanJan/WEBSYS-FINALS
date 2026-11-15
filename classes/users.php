@@ -6,8 +6,25 @@
 			$this -> pdo = $pdo;
 		}
 
+		private function hasColumn($table, $column){
+			try {
+				$check = $this -> pdo -> query("SHOW COLUMNS FROM `" . $table . "` LIKE '" . $column . "'");
+				return $check -> fetch() !== false;
+			} catch (PDOException $e) {
+				return false;
+			}
+		}
+
 		public function insert_data($firstname, $lastname, $email, $password){
-			$insert = "INSERT INTO user(firstname, lastname, email, password) VALUES(:firstname, :lastname, :email, :password)";
+			$email = trim($email);
+			$firstname = trim($firstname);
+			$lastname = trim($lastname);
+
+			if ($this -> hasColumn('user', 'role')) {
+				$insert = "INSERT INTO user(firstname, lastname, email, password, role) VALUES(:firstname, :lastname, :email, :password, 'resident')";
+			} else {
+				$insert = "INSERT INTO user(firstname, lastname, email, password) VALUES(:firstname, :lastname, :email, :password)";
+			}
 
 			$prep = $this -> pdo -> prepare($insert);
 			$prep -> execute([
@@ -19,7 +36,12 @@
 		}
 
 		public function user_login($email, $password) {
-	        $fetch = "SELECT * FROM user WHERE email = :email";
+	        $email = trim(strtolower($email));
+	        $fetch = "SELECT * FROM user WHERE LOWER(email) = :email";
+
+	        if ($this -> hasColumn('user', 'role')) {
+	            $fetch .= " AND role = 'resident'";
+	        }
 
 	        $prep = $this -> pdo ->prepare($fetch);
 	        $prep -> execute([
@@ -29,12 +51,17 @@
 
 	        if($row && $password == $row['password']){
 	            return $row;
-	        }
+        }
 	        return false;
 	    }
 
 	    public function worker_login($email, $password){
-	        $fetch = "SELECT * FROM worker WHERE email = :email";
+	        $email = trim(strtolower($email));
+	        $fetch = "SELECT * FROM user WHERE LOWER(email) = :email";
+
+	        if ($this -> hasColumn('user', 'role')) {
+	            $fetch .= " AND role = 'worker'";
+	        }
 
 	        $prep = $this -> pdo ->prepare($fetch);
 	        $prep -> execute([

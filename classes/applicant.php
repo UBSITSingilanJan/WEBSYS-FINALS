@@ -48,7 +48,7 @@
 		public function fetch_resident_applications($user_id){
 
 		    $fetch = "SELECT * FROM application
-		              WHERE user_id = :user_id";
+		        WHERE user_id = :user_id";
 		    $prep = $this -> pdo -> prepare($fetch);
 		    $prep -> execute([
 		        ":user_id" => $user_id,

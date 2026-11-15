@@ -1,13 +1,19 @@
 
 <?php
+
     require_once "../dbconn.php";
     require_once "../classes/applicant.php";
+    require_once "../classes/resident.php";
 
     $conn = new Applicant($pdo);
+    $residentConn = new Resident($pdo);
+
     $rows = $conn -> fetch_data();
     $totalApplicants = $conn -> count_applicants();
     $totalBenefits = $conn -> count_benefits();
+    $totalResidents = $residentConn -> count_residents();
     $recentApplicants = array_slice($rows, 0, 4);
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -26,33 +32,37 @@
 
     
     <aside class="sidebar">
-
         <h3>Financial Aid System</h3>
-
         <a href="index.php" class="active">Dashboard</a>
-    
+        <a href="manage_applications.php">Manage Applications</a>
+        <a href="search.php">Search Residents</a>
         <a href="logout.php">Logout</a>
-
     </aside>
+
     <main class="main-content">
         <div class="topbar">
 
             <h2>Worker Dashboard</h2>
             <a href="search.php" class="search-clear">Search Residents</a>
 
-<!--             <div class="user-label">
-                Worker &#9662;
-            </div> -->
-
         </div>
+
         <div class="stats-container">
             <div class="stat-card">
                 <p>Total Applicants</p>
-
                 <h1>
                     <?php echo $totalApplicants['total']; ?>
                 </h1>
             </div>
+
+            <div class="stat-card">
+                <p>Total Residents</p>
+
+                <h1>
+                    <?php echo $totalResidents['total']; ?>
+                </h1>
+            </div>
+
             <div class="stat-card" id="benefits">
                 <p>Available Benefits</p>
 
@@ -60,8 +70,8 @@
                     <?php echo $totalBenefits['total']; ?>
                 </h1>
             </div>
+    </div>
 
-        </div>
         <div class="content-grid">
             <section class="panel" id="applicants">
 

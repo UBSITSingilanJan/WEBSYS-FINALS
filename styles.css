@@ -1,0 +1,188 @@
+/* =========================================
+   1. SHARED BACKGROUND & LAYOUT
+   ========================================= */
+body.bg-light, 
+body {
+    background-image: linear-gradient(rgba(11, 61, 107, 0.7), rgba(11, 61, 107, 0.7)), url('background.png');
+    background-size: 120% auto; 
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    
+    /* Background Animation (Synced across pages) */
+    animation: slideBackground 25s ease-in-out infinite alternate;
+    animation-delay: var(--scroll-time, 0s); 
+
+    /* Flexbox for centering */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+@keyframes slideBackground {
+    0% { background-position: 0% center; }
+    100% { background-position: 100% center; }
+}
+
+/* =========================================
+   2. LOGIN PAGE (From your CSS)
+   ========================================= */
+.card.border-0 {
+    position: relative;
+    margin-top: 50px; 
+    background-color: rgba(255, 255, 255, 0.95);
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    overflow: visible; 
+    width: 100%;
+    max-width: 400px; /* Limits width */
+}
+
+.card.border-0::before {
+    content: "";
+    position: absolute;
+    top: -50px; 
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 100px;
+    background-image: url('logo.jpg'); 
+    background-size: cover;
+    background-position: center;
+    border-radius: 50%;
+    border: 4px solid #ffffff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    background-color: #fff;
+}
+
+.btn-primary {
+    background-color: #0b3d6b;
+    border-color: #0b3d6b;
+    font-weight: 600;
+    padding: 12px;
+}
+
+.btn-primary:hover {
+    background-color: #072a4d;
+    border-color: #072a4d;
+}
+
+.form-control {
+    background-color: #f8f9fa;
+    border: 1px solid #ced4da;
+}
+
+.form-control:focus {
+    background-color: #ffffff;
+    border-color: #0b3d6b;
+    box-shadow: 0 0 0 0.25rem rgba(11, 61, 107, 0.25);
+}
+
+a.text-decoration-none {
+    color: #0b3d6b;
+}
+
+a.text-decoration-none:hover {
+    color: #072a4d;
+    text-decoration: underline;
+}
+
+/* =========================================
+   3. REGISTER PAGE (From the new fix)
+   ========================================= */
+h1 {
+    color: #ffffff;
+    font-size: 26px;
+    margin-bottom: 20px;
+    margin-top: 50px;
+    text-align: center;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+body > form {
+    position: relative;
+    background-color: rgba(255, 255, 255, 0.95);
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    width: 100%;
+    max-width: 400px;
+    box-sizing: border-box;
+    margin-bottom: 50px;
+}
+
+/* Floating Logo for Register */
+body > form::before {
+   
+    background-size: cover;
+    background-position: center;
+    border-radius: 50%;
+    border: 4px solid #ffffff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    background-color: #fff;
+}
+
+table { width: 100%; border-collapse: collapse; }
+td { display: block; margin-bottom: 15px; padding: 0; }
+tr:last-child td { display: flex; gap: 15px; margin-top: 25px; }
+
+/* Raw Inputs (Register) */
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    background-color: #f8f9fa;
+    box-sizing: border-box;
+    transition: 0.3s;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus {
+    background-color: #ffffff;
+    border-color: #0b3d6b;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(11, 61, 107, 0.25);
+}
+
+/* Raw Buttons & Links (Register) */
+button, a {
+    flex: 1;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-align: center;
+    cursor: pointer;
+    text-decoration: none;
+    box-sizing: border-box;
+}
+
+button {
+    background-color: #0b3d6b;
+    color: white;
+    border: none;
+    font-size: 16px;
+}
+
+button:hover {
+    background-color: #072a4d;
+}
+
+a {
+    color: #0b3d6b;
+    border: 1px solid #0b3d6b;
+    background-color: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+a:hover {
+    background-color: #eef2f7;
+}

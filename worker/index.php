@@ -17,6 +17,7 @@
 
     <title>Worker Dashboard</title>
     <link rel="stylesheet" href="worker_style.css">
+    
 </head>
 
 <body>
@@ -38,6 +39,7 @@
         <div class="topbar">
 
             <h2>Worker Dashboard</h2>
+            <a href="search.php" class="search-clear">Search Residents</a>
 
 <!--             <div class="user-label">
                 Worker &#9662;

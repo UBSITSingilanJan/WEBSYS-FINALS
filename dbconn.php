@@ -2,7 +2,7 @@
 	$host = "localhost";
 	$user = "root";
 	$pass = "";
-	$db = "financialaidsystem";
+	$db = "financialaidsystem-new";
 	$charset = "utf8mb4";
 
 	$dsn = "mysql:host=$host;dbname=$db;charset=$charset";

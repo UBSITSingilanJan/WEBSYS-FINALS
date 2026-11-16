@@ -1,0 +1,218 @@
+
+/* Application Management */
+
+.page-subtitle {
+    color: #777;
+    font-size: 13px;
+    margin-top: 5px;
+}
+
+.stats-container {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.alert-message {
+    background: #e8efff;
+    color: #1d4ed8;
+    border: 1px solid #c7d7fe;
+    border-radius: 8px;
+    padding: 12px 15px;
+    font-size: 13px;
+    margin-bottom: 18px;
+}
+
+.application-panel,
+.release-history-panel {
+    margin-bottom: 20px;
+}
+
+.management-table {
+    min-width: 1050px;
+}
+
+.management-table th,
+.management-table td {
+    vertical-align: middle;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.status-pending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-approved {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.status-rejected {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.amount-cell {
+    color: #166534;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.action-form {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 190px;
+}
+
+.form-control {
+    padding: 8px 9px;
+    border: 1px solid #d0d5dd;
+    border-radius: 6px;
+    font-size: 12px;
+    outline: none;
+    background: white;
+}
+
+.form-control:focus {
+    border-color: #2563eb;
+}
+
+.status-select {
+    min-width: 105px;
+}
+
+.small-action-btn {
+    padding: 8px 11px;
+    border: none;
+    border-radius: 6px;
+    background: #2563eb;
+    color: white;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.small-action-btn:hover {
+    background: #1d4ed8;
+}
+
+.release-details {
+    min-width: 145px;
+}
+
+.release-toggle {
+    display: inline-block;
+    background: #16a34a;
+    color: white;
+    padding: 8px 11px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: bold;
+    list-style: none;
+    white-space: nowrap;
+}
+
+.release-toggle::-webkit-details-marker {
+    display: none;
+}
+
+.release-toggle:hover {
+    background: #15803d;
+}
+
+.release-form {
+    width: 220px;
+    padding: 13px;
+    margin-top: 9px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+}
+
+.release-form label {
+    display: block;
+    font-size: 12px;
+    font-weight: bold;
+    color: #555;
+    margin: 10px 0 5px;
+}
+
+.release-form input,
+.release-form textarea {
+    width: 100%;
+    padding: 9px;
+    border: 1px solid #d0d5dd;
+    border-radius: 6px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+    outline: none;
+}
+
+.release-form input:focus,
+.release-form textarea:focus {
+    border-color: #2563eb;
+}
+
+.release-form textarea {
+    resize: vertical;
+}
+
+.release-submit {
+    width: 100%;
+    padding: 9px;
+    margin-top: 12px;
+    border: none;
+    border-radius: 6px;
+    background: #16a34a;
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.release-submit:hover {
+    background: #15803d;
+}
+
+.not-approved {
+    color: #888;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.release-history-panel {
+    margin-top: 20px;
+}
+
+@media (max-width: 900px) {
+    .stats-container {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 600px) {
+    .stats-container {
+        grid-template-columns: 1fr;
+    }
+
+    .release-form {
+        width: 200px;
+    }
+}
+
+@media print {
+    .release-toggle,
+    .action-form,
+    .release-form,
+    .not-approved {
+        display: none !important;
+    }
+}

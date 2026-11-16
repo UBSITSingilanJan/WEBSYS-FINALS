@@ -1,36 +1,33 @@
+
 <?php
-session_start();
+    require_once "../dbconn.php";
+    require_once "../classes/resident.php";
 
-if (!isset($_SESSION['user_id'])) {
-    header("Location: ../index.php");
-    exit();
-}
+    $conn = new Resident($pdo);
 
-require_once "../dbconn.php";
-require_once "../classes/resident.php";
+    if(isset($_POST['save_btn'])){
 
-$conn = new Resident($pdo);
+        $firstname = trim($_POST['firstname']);
+        $middlename = trim($_POST['middlename']);
+        $lastname = trim($_POST['lastname']);
+        $age = $_POST['age'];
+        $gender = $_POST['gender'];
+        $contact = trim($_POST['contact']);
+        $address = trim($_POST['address']);
 
-$user_id = $_SESSION['user_id'];
+        $conn -> insert_data(
+            $firstname,
+            $middlename,
+            $lastname,
+            $age,
+            $gender,
+            $contact,
+            $address
+        );
 
-if (isset($_POST['save_btn'])) {
-
-    $firstname = trim($_POST['firstname']);
-    $middlename = trim($_POST['middlename']);
-    $lastname = trim($_POST['lastname']);
-    $age = $_POST['age'];
-    $gender = $_POST['gender'];
-    $contact = trim($_POST['contact']);
-    $address = trim($_POST['address']);
-
-    $conn->insert_data($firstname,$middlename,$lastname,$age,$gender,$contact,$address,$user_id
-    );
-
-    header("Location: profile.php");
-    exit();
-}
-
-$profile = $conn->fetch_resident($user_id);
+        header("Location: profile.php");
+        exit();
+    }
 ?>
 <!DOCTYPE html>
 <html lang="en">

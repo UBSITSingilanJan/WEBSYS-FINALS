@@ -15,6 +15,11 @@
 			}
 		}
 
+		private function passwordMatches($password, $storedPassword){
+			return password_verify($password, $storedPassword)
+				|| hash_equals($storedPassword, $password);
+		}
+
 		public function insert_data($firstname, $lastname, $email, $password){
 			$email = trim($email);
 			$firstname = trim($firstname);
@@ -49,9 +54,9 @@
 	        ]);
 	        $row = $prep -> fetch();
 
-	        if($row && $password == $row['password']){
+	        if($row && $this -> passwordMatches($password, $row['password'])){
 	            return $row;
-        }
+	        }
 	        return false;
 	    }
 
@@ -69,7 +74,7 @@
 	        ]);
 	        $row = $prep -> fetch();
 
-	        if($row && $password == $row['password']){
+	        if($row && $this -> passwordMatches($password, $row['password'])){
 	            return $row;
 	        }
 	        return false;

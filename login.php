@@ -25,6 +25,10 @@
 			$_SESSION["user_id"] = $row['user_id'];
 			$_SESSION["FNAME"]     = $row['firstname'];
 			$_SESSION["LNAME"]     = $row['lastname'];
+<<<<<<< HEAD
+=======
+			$_SESSION["role"]      = $row['role'];
+>>>>>>> 52fad0d (fixed profile and modified application form)
 
 			header("Location: resident/index.php");
 			exit();
@@ -34,9 +38,17 @@
 		$row = $account -> worker_login($email, $password);
 
 		if($row){
+<<<<<<< HEAD
 			$_SESSION["worker_id"] = $row['worker_id'];
 			$_SESSION["FNAME"]     = $row['firstname'];
 			$_SESSION["LNAME"]     = $row['lastname'];
+=======
+			$_SESSION["worker_id"] = $row['user_id'];
+			$_SESSION["user_id"]   = $row['user_id'];
+			$_SESSION["FNAME"]     = $row['firstname'];
+			$_SESSION["LNAME"]     = $row['lastname'];
+			$_SESSION["role"]      = $row['role'];
+>>>>>>> 52fad0d (fixed profile and modified application form)
 
 			header("Location: worker/index.php");
 			exit();

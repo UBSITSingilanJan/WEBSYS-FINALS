@@ -78,7 +78,10 @@ $pending = $prep->fetchAll(PDO::FETCH_ASSOC);
                                 <th>Mode</th>
                                 <th>Received By</th>
                                 <th>Acknowledged</th>
+<<<<<<< HEAD
                                 <th></th>
+=======
+>>>>>>> 52fad0d (fixed profile and modified application form)
                             </tr>
                         </thead>
                         <tbody>

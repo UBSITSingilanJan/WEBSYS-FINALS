@@ -1,5 +1,6 @@
 
 <?php
+<<<<<<< HEAD
     session_start();
 
     require_once "../dbconn.php";
@@ -14,6 +15,26 @@
 ?>
 <!DOCTYPE html>
 <html lang="en">
+=======
+session_start();
+
+require_once "../dbconn.php";
+require_once "../classes/applicant.php";
+
+if (!isset($_SESSION['user_id'])) {
+    header("Location: ../index.php");
+    exit();
+}
+
+$conn = new Applicant($pdo);
+
+$applications = $conn->fetch_resident_applications($_SESSION['user_id']);
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+
+>>>>>>> 52fad0d (fixed profile and modified application form)
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -21,6 +42,7 @@
     <title>Resident Dashboard</title>
 
     <link rel="stylesheet" href="resident_style.css">
+<<<<<<< HEAD
 
     <style>
         .application-item {
@@ -71,13 +93,18 @@
             color: #41464b;
         }
     </style>
+=======
+>>>>>>> 52fad0d (fixed profile and modified application form)
 </head>
 
 <body>
 
 <div class="dashboard">
 
+<<<<<<< HEAD
     <!-- Sidebar -->
+=======
+>>>>>>> 52fad0d (fixed profile and modified application form)
     <aside class="sidebar">
 
         <h3>Financial Aid System</h3>
@@ -88,6 +115,7 @@
         <a href="logout.php">Logout</a>
 
     </aside>
+<<<<<<< HEAD
     <main class="main-content">
         <div class="topbar">
 
@@ -99,10 +127,22 @@
 
         </div>
         <div class="content-grid">
+=======
+
+    <main class="main-content">
+
+        <div class="topbar">
+            <h2>My Aid Application</h2>
+        </div>
+
+        <div class="content-grid">
+
+>>>>>>> 52fad0d (fixed profile and modified application form)
             <section class="panel">
 
                 <h3>My Applications</h3>
 
+<<<<<<< HEAD
                 <?php if(!empty($applications)){ ?>
 
                     <?php foreach($applications as $application){ ?>
@@ -119,26 +159,58 @@
                             } else {
                                 $statusClass = "unknown";
                             }
+=======
+                <?php if (!empty($applications)) { ?>
+
+                    <?php foreach ($applications as $application) { ?>
+
+                        <?php
+                        $status = strtolower($application['status']);
+
+                        if ($status == "pending") {
+                            $statusClass = "pending";
+                        } elseif ($status == "approved") {
+                            $statusClass = "approved";
+                        } elseif ($status == "rejected") {
+                            $statusClass = "rejected";
+                        } else {
+                            $statusClass = "unknown";
+                        }
+>>>>>>> 52fad0d (fixed profile and modified application form)
                         ?>
 
                         <div class="application-item">
 
                             <h4>
+<<<<<<< HEAD
                                 <?php echo htmlspecialchars($application['aid_type']); ?>
+=======
+                                <?php
+                                echo htmlspecialchars($application['aid_type']);
+                                ?>
+>>>>>>> 52fad0d (fixed profile and modified application form)
                             </h4>
 
                             <p>
                                 Applicant:
                                 <?php
+<<<<<<< HEAD
                                     echo htmlspecialchars(
                                         $application['firstname'] . " " .
                                         $application['lastname']
                                     );
+=======
+                                echo htmlspecialchars(
+                                    $application['firstname'] . " " .
+                                    $application['lastname']
+                                );
+>>>>>>> 52fad0d (fixed profile and modified application form)
                                 ?>
                             </p>
 
                             <p>
                                 Email:
+<<<<<<< HEAD
                                 <?php echo htmlspecialchars($application['email']); ?>
                             </p>
 
@@ -148,6 +220,19 @@
 
                             <span class="status-badge <?php echo $statusClass; ?>">
                                 <?php echo htmlspecialchars($application['status']); ?>
+=======
+                                <?php
+                                echo htmlspecialchars($application['email']);
+                                ?>
+                            </p>
+
+                            <p>Application Status:</p>
+
+                            <span class="status-badge <?php echo $statusClass; ?>">
+                                <?php
+                                echo htmlspecialchars($application['status']);
+                                ?>
+>>>>>>> 52fad0d (fixed profile and modified application form)
                             </span>
 
                         </div>
@@ -171,6 +256,7 @@
                 <?php } ?>
 
             </section>
+<<<<<<< HEAD
             <section class="panel">
                 <h3>Application Status</h3>
 
@@ -216,6 +302,11 @@
                 <?php } ?>
             </section>
         </div>
+=======
+
+        </div>
+
+>>>>>>> 52fad0d (fixed profile and modified application form)
     </main>
 
 </div>

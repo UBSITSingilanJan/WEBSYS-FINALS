@@ -1,83 +1,103 @@
+
 <?php
-	class User{
-		private PDO $pdo;
+    class User{
+        private PDO $pdo;
 
-		function __construct(PDO $pdo){
-			$this -> pdo = $pdo;
-		}
+        function __construct(PDO $pdo){
+            $this -> pdo = $pdo;
+        }
 
-		private function hasColumn($table, $column){
-			try {
-				$check = $this -> pdo -> query("SHOW COLUMNS FROM `" . $table . "` LIKE '" . $column . "'");
-				return $check -> fetch() !== false;
-			} catch (PDOException $e) {
-				return false;
-			}
-		}
+        private function hasColumn($table, $column){
+            try {
+                $check = $this -> pdo -> query("SHOW COLUMNS FROM `" . $table . "` LIKE '" . $column . "'");
+                return $check -> fetch() !== false;
+            } catch (PDOException $e) {
+                return false;
+            }
+        }
 
-		private function passwordMatches($password, $storedPassword){
-			return password_verify($password, $storedPassword)
-				|| hash_equals($storedPassword, $password);
-		}
+        private function passwordMatches($password, $storedPassword){
+            return password_verify($password, $storedPassword)
+                || hash_equals($storedPassword, $password);
+        }
 
-		public function insert_data($firstname, $lastname, $email, $password){
-			$email = trim($email);
-			$firstname = trim($firstname);
-			$lastname = trim($lastname);
+        public function insert_data($firstname, $lastname, $email, $password){
+            $email = trim($email);
+            $firstname = trim($firstname);
+            $lastname = trim($lastname);
 
-			if ($this -> hasColumn('user', 'role')) {
-				$insert = "INSERT INTO user(firstname, lastname, email, password, role) VALUES(:firstname, :lastname, :email, :password, 'resident')";
-			} else {
-				$insert = "INSERT INTO user(firstname, lastname, email, password) VALUES(:firstname, :lastname, :email, :password)";
-			}
+            try {
+                $this -> pdo -> beginTransaction();
 
-			$prep = $this -> pdo -> prepare($insert);
-			$prep -> execute([
-				":firstname" => $firstname,
-				":lastname" => $lastname,
-				":email" => $email,
-				":password" => $password,
-			]);
-		}
+                if ($this -> hasColumn('user', 'role')) {
+                    $insert = "INSERT INTO user(firstname, lastname, email, password, role) VALUES(:firstname, :lastname, :email, :password, 'resident')";
+                } else {
+                    $insert = "INSERT INTO user(firstname, lastname, email, password) VALUES(:firstname, :lastname, :email, :password)";
+                }
 
-		public function user_login($email, $password) {
-	        $email = trim(strtolower($email));
-	        $fetch = "SELECT * FROM user WHERE LOWER(email) = :email";
+                $prep = $this -> pdo -> prepare($insert);
+                $prep -> execute([
+                    ":firstname" => $firstname,
+                    ":lastname" => $lastname,
+                    ":email" => $email,
+                    ":password" => $password,
+                ]);
 
-	        if ($this -> hasColumn('user', 'role')) {
-	            $fetch .= " AND role = 'resident'";
-	        }
+                $user_id = $this -> pdo -> lastInsertId();
 
-	        $prep = $this -> pdo ->prepare($fetch);
-	        $prep -> execute([
-	        	":email" => $email,
-	        ]);
-	        $row = $prep -> fetch();
+                $insert_resident = "INSERT INTO resident_information (user_id, firstname, lastname) VALUES (?, ?, ?)";
 
-	        if($row && $this -> passwordMatches($password, $row['password'])){
-	            return $row;
-	        }
-	        return false;
-	    }
+                $prep_resident = $this -> pdo -> prepare($insert_resident);
+                $prep_resident -> execute([$user_id, $firstname, $lastname]);
 
-	    public function worker_login($email, $password){
-	        $email = trim(strtolower($email));
-	        $fetch = "SELECT * FROM user WHERE LOWER(email) = :email";
+                $this -> pdo -> commit();
 
-	        if ($this -> hasColumn('user', 'role')) {
-	            $fetch .= " AND role = 'worker'";
-	        }
+                return true;
 
-	        $prep = $this -> pdo ->prepare($fetch);
-	        $prep -> execute([
-	        	":email" => $email,
-	        ]);
-	        $row = $prep -> fetch();
+            } catch (PDOException $e) {
+                $this -> pdo -> rollBack();
+                throw $e;
+            }
+        }
 
-	        if($row && $this -> passwordMatches($password, $row['password'])){
-	            return $row;
-	        }
-	        return false;
-	    }
-	}
+        public function user_login($email, $password) {
+            $email = trim(strtolower($email));
+            $fetch = "SELECT * FROM user WHERE LOWER(email) = :email";
+
+            if ($this -> hasColumn('user', 'role')) {
+                $fetch .= " AND role = 'resident'";
+            }
+
+            $prep = $this -> pdo ->prepare($fetch);
+            $prep -> execute([
+                ":email" => $email,
+            ]);
+            $row = $prep -> fetch();
+
+            if($row && $this -> passwordMatches($password, $row['password'])){
+                return $row;
+            }
+            return false;
+        }
+
+        public function worker_login($email, $password){
+            $email = trim(strtolower($email));
+            $fetch = "SELECT * FROM user WHERE LOWER(email) = :email";
+
+            if ($this -> hasColumn('user', 'role')) {
+                $fetch .= " AND role = 'worker'";
+            }
+
+            $prep = $this -> pdo ->prepare($fetch);
+            $prep -> execute([
+                ":email" => $email,
+            ]);
+            $row = $prep -> fetch();
+
+            if($row && $this -> passwordMatches($password, $row['password'])){
+                return $row;
+            }
+            return false;
+        }
+    }
 ?>

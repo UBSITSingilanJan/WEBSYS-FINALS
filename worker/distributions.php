@@ -78,7 +78,6 @@ $pending = $prep->fetchAll(PDO::FETCH_ASSOC);
                                 <th>Mode</th>
                                 <th>Received By</th>
                                 <th>Acknowledged</th>
-                                <th></th>
                             </tr>
                         </thead>
                         <tbody>

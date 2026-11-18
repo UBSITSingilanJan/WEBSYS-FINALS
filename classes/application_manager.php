@@ -9,6 +9,7 @@ class ApplicationManager {
         $this->pdo = $pdo;
     }
 
+    // VALIDATE RELEASE INPUT
     private function validate_release_input($amount, $release_date) {
 
         if (
@@ -37,6 +38,7 @@ class ApplicationManager {
         return ["success" => true];
     }
 
+    // CHECK IF APPLICATION IS APPROVED
     private function check_approved_application($applicant_id) {
 
         $sql = "SELECT status
@@ -67,30 +69,64 @@ class ApplicationManager {
         return ["success" => true];
     }
 
+    // UPDATE APPLICATION STATUS
     public function update_status($applicant_id, $status) {
 
         if (!in_array($status, ["Pending", "Approved", "Rejected"], true)) {
             return false;
         }
 
-        $sql = "UPDATE application
-                SET status = :status
-                WHERE applicant_id = :applicant_id";
+        try {
 
-        $stmt = $this->pdo->prepare($sql);
+            $this->pdo->beginTransaction();
 
-        return $stmt->execute([
-            ":status" => $status,
-            ":applicant_id" => $applicant_id
-        ]);
+            $sql = "UPDATE application
+                    SET status = :status
+                    WHERE applicant_id = :applicant_id";
+
+            $stmt = $this->pdo->prepare($sql);
+
+            $stmt->execute([
+                ":status" => $status,
+                ":applicant_id" => $applicant_id
+            ]);
+
+            // Deactivate previous releases when rejected.
+            // They remain in the database for release history.
+            if ($status === "Rejected") {
+
+                $deactivate = "UPDATE assistance_release
+                               SET is_active = 0
+                               WHERE applicant_id = :applicant_id";
+
+                $stmt = $this->pdo->prepare($deactivate);
+
+                $stmt->execute([
+                    ":applicant_id" => $applicant_id
+                ]);
+            }
+
+            $this->pdo->commit();
+
+            return true;
+
+        } catch (PDOException $e) {
+
+            if ($this->pdo->inTransaction()) {
+                $this->pdo->rollBack();
+            }
+
+            return false;
+        }
     }
 
-    /*
-     * CREATE FIRST RELEASE
-     */
+    // RECORD NEW RELEASE
     public function record_release($applicant_id, $amount, $release_date, $remarks) {
 
-        $validation = $this->validate_release_input($amount, $release_date);
+        $validation = $this->validate_release_input(
+            $amount,
+            $release_date
+        );
 
         if (!$validation['success']) {
             return $validation;
@@ -102,12 +138,12 @@ class ApplicationManager {
             return $applicationCheck;
         }
 
-        $insert = "INSERT INTO assistance_release
-                   (applicant_id, amount, release_date, remarks)
-                   VALUES
-                   (:applicant_id, :amount, :release_date, :remarks)";
+        $sql = "INSERT INTO assistance_release
+                (applicant_id, amount, release_date, remarks, is_active)
+                VALUES
+                (:applicant_id, :amount, :release_date, :remarks, 1)";
 
-        $stmt = $this->pdo->prepare($insert);
+        $stmt = $this->pdo->prepare($sql);
 
         $stmt->execute([
             ":applicant_id" => $applicant_id,
@@ -122,12 +158,13 @@ class ApplicationManager {
         ];
     }
 
-    /*
-     * UPDATE AN EXISTING RELEASE
-     */
+    // UPDATE EXISTING ACTIVE RELEASE
     public function update_release($release_id, $applicant_id, $amount, $release_date, $remarks) {
 
-        $validation = $this->validate_release_input($amount, $release_date);
+        $validation = $this->validate_release_input(
+            $amount,
+            $release_date
+        );
 
         if (!$validation['success']) {
             return $validation;
@@ -139,11 +176,12 @@ class ApplicationManager {
             return $applicationCheck;
         }
 
-        // Make sure this release belongs to the selected applicant.
+        // Only allow editing an active release.
         $check = "SELECT release_id
                   FROM assistance_release
                   WHERE release_id = :release_id
-                  AND applicant_id = :applicant_id";
+                  AND applicant_id = :applicant_id
+                  AND is_active = 1";
 
         $stmt = $this->pdo->prepare($check);
 
@@ -155,18 +193,19 @@ class ApplicationManager {
         if (!$stmt->fetch(PDO::FETCH_ASSOC)) {
             return [
                 "success" => false,
-                "message" => "Release record not found."
+                "message" => "Active release record not found."
             ];
         }
 
-        $update = "UPDATE assistance_release
-                   SET amount = :amount,
-                       release_date = :release_date,
-                       remarks = :remarks
-                   WHERE release_id = :release_id
-                   AND applicant_id = :applicant_id";
+        $sql = "UPDATE assistance_release
+                SET amount = :amount,
+                    release_date = :release_date,
+                    remarks = :remarks
+                WHERE release_id = :release_id
+                AND applicant_id = :applicant_id
+                AND is_active = 1";
 
-        $stmt = $this->pdo->prepare($update);
+        $stmt = $this->pdo->prepare($sql);
 
         $stmt->execute([
             ":amount" => number_format((float)$amount, 2, '.', ''),
@@ -182,9 +221,7 @@ class ApplicationManager {
         ];
     }
 
-    /*
-     * FETCH APPLICATIONS AND THEIR LATEST RELEASE
-     */
+    // FETCH APPLICATIONS AND ACTIVE RELEASES
     public function fetch_applications($search = "") {
 
         $sql = "SELECT
@@ -196,19 +233,25 @@ class ApplicationManager {
                     a.aid_type,
                     a.status,
 
-                    COALESCE(
-                        (
-                            SELECT SUM(r.amount)
-                            FROM assistance_release r
-                            WHERE r.applicant_id = a.applicant_id
-                        ),
-                        0
-                    ) AS total_released,
+                    CASE
+                        WHEN a.status = 'Approved' THEN
+                            COALESCE(
+                                (
+                                    SELECT SUM(r.amount)
+                                    FROM assistance_release r
+                                    WHERE r.applicant_id = a.applicant_id
+                                    AND r.is_active = 1
+                                ),
+                                0
+                            )
+                        ELSE 0
+                    END AS total_released,
 
                     (
                         SELECT r.release_id
                         FROM assistance_release r
                         WHERE r.applicant_id = a.applicant_id
+                        AND r.is_active = 1
                         ORDER BY r.release_id DESC
                         LIMIT 1
                     ) AS latest_release_id,
@@ -217,6 +260,7 @@ class ApplicationManager {
                         SELECT r.amount
                         FROM assistance_release r
                         WHERE r.applicant_id = a.applicant_id
+                        AND r.is_active = 1
                         ORDER BY r.release_id DESC
                         LIMIT 1
                     ) AS latest_release_amount,
@@ -225,6 +269,7 @@ class ApplicationManager {
                         SELECT r.release_date
                         FROM assistance_release r
                         WHERE r.applicant_id = a.applicant_id
+                        AND r.is_active = 1
                         ORDER BY r.release_id DESC
                         LIMIT 1
                     ) AS latest_release_date,
@@ -233,6 +278,7 @@ class ApplicationManager {
                         SELECT r.remarks
                         FROM assistance_release r
                         WHERE r.applicant_id = a.applicant_id
+                        AND r.is_active = 1
                         ORDER BY r.release_id DESC
                         LIMIT 1
                     ) AS latest_release_remarks
@@ -270,9 +316,8 @@ class ApplicationManager {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /*
-     * FETCH RECENT RELEASE HISTORY
-     */
+    // FETCH RECENT RELEASE HISTORY
+    // Includes inactive releases for historical reference.
     public function fetch_recent_releases() {
 
         $sql = "SELECT
@@ -280,6 +325,7 @@ class ApplicationManager {
                     r.amount,
                     r.release_date,
                     r.remarks,
+                    r.is_active,
                     a.firstname,
                     a.lastname,
                     a.aid_type
@@ -295,9 +341,7 @@ class ApplicationManager {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /*
-     * COUNT APPLICATIONS
-     */
+    // COUNT APPLICATIONS
     public function count_applications() {
 
         $sql = "SELECT

@@ -55,15 +55,28 @@
     </aside>
     <main class="main-content">
         <div class="topbar">
-
             <h2>My Profile</h2>
-
-            <div class="user-label">
-                Resident &#9662;
-            </div>
-
         </div>
         <div class="content-grid">
+        <section class="panel">
+            <h3>Profile Information</h3>
+            <div class="status-number">
+                &#128100;
+            </div>
+
+            <p class="status-description">
+                Please complete your personal information
+                accurately. This information will be used
+                for your financial aid application.
+            </p>
+            <br>
+
+            <p class="status-description">
+                Make sure your contact number and address
+                are correct before saving your profile.
+            </p>
+
+            </section>
             <section class="panel">
 
                 <h3>Personal Information</h3>
@@ -160,28 +173,7 @@
                 </form>
 
             </section>
-            <section class="panel">
-
-                <h3>Profile Information</h3>
-
-                <div class="status-number">
-                    &#128100;
-                </div>
-
-                <p class="status-description">
-                    Please complete your personal information
-                    accurately. This information will be used
-                    for your financial aid application.
-                </p>
-
-                <br>
-
-                <p class="status-description">
-                    Make sure your contact number and address
-                    are correct before saving your profile.
-                </p>
-
-            </section>
+            
         </div>
     </main>
 

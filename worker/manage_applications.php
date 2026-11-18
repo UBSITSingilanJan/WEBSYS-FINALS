@@ -1,7 +1,9 @@
 
 <?php
+
 session_start();
 
+// WORKER SESSION CHECK
 if (
     !isset($_SESSION['user_id']) ||
     !isset($_SESSION['role']) ||
@@ -11,12 +13,14 @@ if (
     exit();
 }
 
+// DATABASE AND CLASS
 require_once "../dbconn.php";
 require_once "../classes/application_manager.php";
 
 $manager = new ApplicationManager($pdo);
 
-// Escape output
+
+// ESCAPE OUTPUT
 function e($value) {
     return htmlspecialchars(
         (string)($value ?? ""),
@@ -25,29 +29,25 @@ function e($value) {
     );
 }
 
-// Redirect while preserving search and optionally reopening a release form
-function redirect_page($openApplicantId = null) {
+
+// REDIRECT FUNCTION
+// Preserves the search keyword without automatically opening Edit Release.
+function redirect_page() {
 
     $search = trim($_POST['q'] ?? $_GET['q'] ?? "");
-    $params = [];
+
+    $query = "";
 
     if ($search !== "") {
-        $params['q'] = $search;
+        $query = "?q=" . urlencode($search);
     }
-
-    if ($openApplicantId !== null && $openApplicantId > 0) {
-        $params['edit'] = $openApplicantId;
-    }
-
-    $query = !empty($params)
-        ? "?" . http_build_query($params)
-        : "";
 
     header("Location: manage_applications.php" . $query);
     exit();
 }
 
-// Handle POST requests
+
+// HANDLE FORM SUBMISSIONS
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $action = $_POST['action'] ?? "";
@@ -58,9 +58,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     );
 
     if (!$applicant_id || $applicant_id <= 0) {
+
         $_SESSION['flash'] = "Invalid applicant record.";
+
         redirect_page();
     }
+
 
     // UPDATE APPLICATION STATUS
     if ($action === "update_status") {
@@ -74,16 +77,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
 
             if ($manager->update_status($applicant_id, $status)) {
+
                 $_SESSION['flash'] = "Application status updated successfully.";
+
             } else {
+
                 $_SESSION['flash'] = "Unable to update application status.";
+
             }
         }
 
         redirect_page();
     }
 
-    // CREATE FIRST RELEASE
+
+    // ADD FIRST ASSISTANCE RELEASE
     if ($action === "record_release") {
 
         $amount = $_POST['amount'] ?? "";
@@ -99,11 +107,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $_SESSION['flash'] = $result['message'];
 
-        // Reopen the release form after saving
-        redirect_page($applicant_id);
+        // After saving, show Edit Release but keep its form closed.
+        redirect_page();
     }
 
-    // UPDATE EXISTING RELEASE
+
+    // UPDATE EXISTING ASSISTANCE RELEASE
     if ($action === "update_release") {
 
         $release_id = filter_var(
@@ -132,28 +141,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['flash'] = $result['message'];
         }
 
-        // Reopen the form with the updated information
-        redirect_page($applicant_id);
+        // After editing, close the form again.
+        redirect_page();
     }
 
+
+    // INVALID ACTION
     $_SESSION['flash'] = "Invalid action.";
 
     redirect_page();
 }
 
-// GET DATA
+
+// FETCH PAGE DATA
 $search = trim($_GET['q'] ?? "");
 
-$openApplicantId = filter_var(
-    $_GET['edit'] ?? null,
-    FILTER_VALIDATE_INT
-);
-
 $applicants = $manager->fetch_applications($search);
+
 $releases = $manager->fetch_recent_releases();
+
 $counts = $manager->count_applications();
 
 $flash = $_SESSION['flash'] ?? "";
+
 unset($_SESSION['flash']);
 
 ?>
@@ -169,35 +179,33 @@ unset($_SESSION['flash']);
 
     <title>Manage Applications</title>
 
-    <!-- CSS Files -->
+    <!-- CSS FILES -->
     <link rel="stylesheet" href="worker_style.css">
     <link rel="stylesheet" href="manage_applications.css">
 
 </head>
 
+
 <body>
 
 <div class="dashboard">
 
-    <!-- SIDEBAR -->
+
     <aside class="sidebar">
-
         <h3>Financial Aid System</h3>
-
         <a href="index.php">Dashboard</a>
-
-        <a href="manage_applications.php" class="active">
-            Manage Applications
-        </a>
-
+        <a href="manage_programs.php">Add Program</a>
+        <a href="manage_applications.php" class="active">Manage Applications</a>
         <a href="logout.php">Logout</a>
-
     </aside>
+
 
 
     <!-- MAIN CONTENT -->
     <main class="main-content">
 
+
+        <!-- TOPBAR -->
         <div class="topbar">
 
             <div>
@@ -213,18 +221,23 @@ unset($_SESSION['flash']);
         </div>
 
 
+
         <!-- NOTIFICATION -->
         <?php if ($flash !== "") { ?>
 
             <div class="alert-message">
+
                 <?php echo e($flash); ?>
+
             </div>
 
         <?php } ?>
 
 
-        <!-- STATISTICS -->
+
+        <!-- APPLICATION STATISTICS -->
         <div class="stats-container">
+
 
             <div class="stat-card">
 
@@ -235,6 +248,7 @@ unset($_SESSION['flash']);
                 </h1>
 
             </div>
+
 
 
             <div class="stat-card">
@@ -248,6 +262,7 @@ unset($_SESSION['flash']);
             </div>
 
 
+
             <div class="stat-card">
 
                 <p>Approved Applications</p>
@@ -257,6 +272,7 @@ unset($_SESSION['flash']);
                 </h1>
 
             </div>
+
 
 
             <div class="stat-card">
@@ -269,11 +285,14 @@ unset($_SESSION['flash']);
 
             </div>
 
+
         </div>
+
 
 
         <!-- APPLICANT RECORDS -->
         <section class="panel application-panel">
+
 
             <div class="panel-header">
 
@@ -282,7 +301,8 @@ unset($_SESSION['flash']);
             </div>
 
 
-            <!-- SEARCH -->
+
+            <!-- SEARCH FORM -->
             <form method="GET" class="search-form">
 
                 <input
@@ -293,13 +313,18 @@ unset($_SESSION['flash']);
                     value="<?php echo e($search); ?>"
                 >
 
+
                 <button type="submit" class="search-btn">
                     Search
                 </button>
 
+
                 <?php if ($search !== "") { ?>
 
-                    <a href="manage_applications.php" class="search-clear">
+                    <a
+                        href="manage_applications.php"
+                        class="search-clear"
+                    >
                         Clear Search
                     </a>
 
@@ -308,20 +333,29 @@ unset($_SESSION['flash']);
             </form>
 
 
+
+            <!-- APPLICANTS TABLE -->
             <div class="table-wrapper">
 
                 <table class="applicant-table management-table">
+
 
                     <thead>
 
                         <tr>
 
                             <th>Applicant</th>
+
                             <th>Email</th>
+
                             <th>Program</th>
+
                             <th>Status</th>
+
                             <th>Total Released</th>
+
                             <th>Update Status</th>
+
                             <th>Record Assistance</th>
 
                         </tr>
@@ -329,29 +363,41 @@ unset($_SESSION['flash']);
                     </thead>
 
 
+
                     <tbody>
+
 
                         <?php if (!empty($applicants)) { ?>
 
+
                             <?php foreach ($applicants as $applicant) { ?>
+
 
                                 <?php
 
+                                // CHECK IF APPLICANT HAS A RELEASE
                                 $hasRelease = !empty(
                                     $applicant['latest_release_id']
                                 );
 
+
+                                // STATUS CLASS
                                 $statusClass = strtolower(
                                     $applicant['status']
                                 );
 
+
+                                // RELEASE DATE
                                 $releaseDate = $hasRelease
                                     ? $applicant['latest_release_date']
                                     : date('Y-m-d');
 
                                 ?>
 
+
+
                                 <tr>
+
 
                                     <!-- APPLICANT NAME -->
                                     <td>
@@ -373,12 +419,14 @@ unset($_SESSION['flash']);
                                     </td>
 
 
+
                                     <!-- EMAIL -->
                                     <td>
 
                                         <?php echo e($applicant['email']); ?>
 
                                     </td>
+
 
 
                                     <!-- PROGRAM -->
@@ -393,7 +441,8 @@ unset($_SESSION['flash']);
                                     </td>
 
 
-                                    <!-- STATUS -->
+
+                                    <!-- APPLICATION STATUS -->
                                     <td>
 
                                         <span class="status-badge status-<?php echo e($statusClass); ?>">
@@ -403,6 +452,7 @@ unset($_SESSION['flash']);
                                         </span>
 
                                     </td>
+
 
 
                                     <!-- TOTAL RELEASED -->
@@ -416,10 +466,14 @@ unset($_SESSION['flash']);
                                     </td>
 
 
+
                                     <!-- UPDATE STATUS -->
                                     <td>
 
-                                        <form method="POST" class="action-form">
+                                        <form
+                                            method="POST"
+                                            class="action-form"
+                                        >
 
                                             <input
                                                 type="hidden"
@@ -427,17 +481,20 @@ unset($_SESSION['flash']);
                                                 value="update_status"
                                             >
 
+
                                             <input
                                                 type="hidden"
                                                 name="applicant_id"
                                                 value="<?php echo (int)$applicant['applicant_id']; ?>"
                                             >
 
+
                                             <input
                                                 type="hidden"
                                                 name="q"
                                                 value="<?php echo e($search); ?>"
                                             >
+
 
                                             <select
                                                 name="status"
@@ -452,12 +509,14 @@ unset($_SESSION['flash']);
                                                     Pending
                                                 </option>
 
+
                                                 <option
                                                     value="Approved"
                                                     <?php echo $applicant['status'] === "Approved" ? "selected" : ""; ?>
                                                 >
                                                     Approved
                                                 </option>
+
 
                                                 <option
                                                     value="Rejected"
@@ -467,6 +526,7 @@ unset($_SESSION['flash']);
                                                 </option>
 
                                             </select>
+
 
 
                                             <button
@@ -481,42 +541,51 @@ unset($_SESSION['flash']);
                                     </td>
 
 
-                                    <!-- ADD / EDIT RELEASE -->
+
+                                    <!-- ADD OR EDIT RELEASE -->
                                     <td class="release-details">
+
 
                                         <?php if ($applicant['status'] === "Approved") { ?>
 
-                                            <details
-                                                <?php
-                                                echo (
-                                                    (int)$openApplicantId ===
-                                                    (int)$applicant['applicant_id']
-                                                ) ? "open" : "";
-                                                ?>
-                                            >
+
+                                            <!--
+                                                DETAILS HAS NO OPEN ATTRIBUTE.
+                                                THIS KEEPS THE FORM CLOSED
+                                                UNTIL THE WORKER CLICKS THE BUTTON.
+                                            -->
+
+                                            <details>
+
 
                                                 <summary class="release-toggle">
 
                                                     <?php
+
                                                     echo $hasRelease
                                                         ? "Edit Release"
                                                         : "Add Release";
+
                                                     ?>
 
                                                 </summary>
 
 
+
+                                                <!-- RELEASE FORM -->
                                                 <form
                                                     method="POST"
                                                     class="release-form"
                                                 >
 
-                                                    <!-- ACTION -->
+
+                                                    <!-- FORM ACTION -->
                                                     <input
                                                         type="hidden"
                                                         name="action"
                                                         value="<?php echo $hasRelease ? 'update_release' : 'record_release'; ?>"
                                                     >
+
 
 
                                                     <!-- APPLICANT ID -->
@@ -527,7 +596,8 @@ unset($_SESSION['flash']);
                                                     >
 
 
-                                                    <!-- RELEASE ID FOR UPDATING -->
+
+                                                    <!-- RELEASE ID -->
                                                     <?php if ($hasRelease) { ?>
 
                                                         <input
@@ -539,6 +609,7 @@ unset($_SESSION['flash']);
                                                     <?php } ?>
 
 
+
                                                     <!-- SEARCH VALUE -->
                                                     <input
                                                         type="hidden"
@@ -547,8 +618,11 @@ unset($_SESSION['flash']);
                                                     >
 
 
+
                                                     <!-- AMOUNT -->
-                                                    <label>Amount (₱)</label>
+                                                    <label>
+                                                        Amount (₱)
+                                                    </label>
 
                                                     <input
                                                         type="number"
@@ -558,16 +632,21 @@ unset($_SESSION['flash']);
                                                         step="0.01"
                                                         placeholder="Enter amount"
                                                         value="<?php
+
                                                             echo $hasRelease
                                                                 ? e($applicant['latest_release_amount'])
                                                                 : "";
+
                                                         ?>"
                                                         required
                                                     >
 
 
+
                                                     <!-- RELEASE DATE -->
-                                                    <label>Release Date</label>
+                                                    <label>
+                                                        Release Date
+                                                    </label>
 
                                                     <input
                                                         type="date"
@@ -577,8 +656,11 @@ unset($_SESSION['flash']);
                                                     >
 
 
+
                                                     <!-- REMARKS -->
-                                                    <label>Remarks</label>
+                                                    <label>
+                                                        Remarks
+                                                    </label>
 
                                                     <textarea
                                                         name="remarks"
@@ -586,10 +668,13 @@ unset($_SESSION['flash']);
                                                         maxlength="255"
                                                         placeholder="Optional remarks"
                                                     ><?php
+
                                                         echo $hasRelease
                                                             ? e($applicant['latest_release_remarks'])
                                                             : "";
+
                                                     ?></textarea>
+
 
 
                                                     <!-- SUBMIT BUTTON -->
@@ -599,54 +684,75 @@ unset($_SESSION['flash']);
                                                     >
 
                                                         <?php
+
                                                         echo $hasRelease
                                                             ? "Save Changes"
                                                             : "Save Release";
+
                                                         ?>
 
                                                     </button>
 
+
                                                 </form>
+
 
                                             </details>
 
+
                                         <?php } else { ?>
+
 
                                             <span class="not-approved">
                                                 Approve first
                                             </span>
 
+
                                         <?php } ?>
+
 
                                     </td>
 
+
                                 </tr>
+
 
                             <?php } ?>
 
+
                         <?php } else { ?>
+
 
                             <tr>
 
                                 <td colspan="7" class="empty-message">
+
                                     No applicants found.
+
                                 </td>
 
                             </tr>
 
+
                         <?php } ?>
 
+
                     </tbody>
+
 
                 </table>
 
             </div>
 
+
         </section>
+
+
 
 
         <!-- RECENT ASSISTANCE RELEASES -->
         <section class="panel release-history-panel">
+
 
             <div class="panel-header">
 
@@ -655,18 +761,25 @@ unset($_SESSION['flash']);
             </div>
 
 
+
             <div class="table-wrapper">
 
+
                 <table class="applicant-table">
+
 
                     <thead>
 
                         <tr>
 
                             <th>Applicant</th>
+
                             <th>Program</th>
+
                             <th>Amount Released</th>
+
                             <th>Release Date</th>
+
                             <th>Remarks</th>
 
                         </tr>
@@ -674,14 +787,20 @@ unset($_SESSION['flash']);
                     </thead>
 
 
+
                     <tbody>
+
 
                         <?php if (!empty($releases)) { ?>
 
+
                             <?php foreach ($releases as $release) { ?>
+
 
                                 <tr>
 
+
+                                    <!-- APPLICANT -->
                                     <td>
 
                                         <?php
@@ -696,6 +815,8 @@ unset($_SESSION['flash']);
                                     </td>
 
 
+
+                                    <!-- PROGRAM -->
                                     <td>
 
                                         <?php echo e($release['aid_type']); ?>
@@ -703,6 +824,8 @@ unset($_SESSION['flash']);
                                     </td>
 
 
+
+                                    <!-- AMOUNT -->
                                     <td class="amount-cell">
 
                                         ₱<?php echo number_format(
@@ -713,6 +836,8 @@ unset($_SESSION['flash']);
                                     </td>
 
 
+
+                                    <!-- RELEASE DATE -->
                                     <td>
 
                                         <?php echo e($release['release_date']); ?>
@@ -720,6 +845,8 @@ unset($_SESSION['flash']);
                                     </td>
 
 
+
+                                    <!-- REMARKS -->
                                     <td>
 
                                         <?php
@@ -732,11 +859,15 @@ unset($_SESSION['flash']);
 
                                     </td>
 
+
                                 </tr>
+
 
                             <?php } ?>
 
+
                         <?php } else { ?>
+
 
                             <tr>
 
@@ -748,15 +879,21 @@ unset($_SESSION['flash']);
 
                             </tr>
 
+
                         <?php } ?>
+
 
                     </tbody>
 
+
                 </table>
+
 
             </div>
 
+
         </section>
+
 
 
         <!-- FOOTER -->
@@ -765,6 +902,7 @@ unset($_SESSION['flash']);
             Financial Aid System | Worker Management
 
         </div>
+
 
     </main>
 

@@ -27,7 +27,6 @@ if ($search !== '') {
     <aside class="sidebar">
         <h3>Financial Aid System</h3>
         <a href="index.php">Dashboard</a>
-        <a href="search.php" class="active">Search Residents</a>
         <a href="distributions.php">Distributions</a>
         <a href="logout.php">Logout</a>
     </aside>

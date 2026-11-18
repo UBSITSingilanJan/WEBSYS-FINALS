@@ -1,0 +1,120 @@
+body {
+    background-color: #f4f7f6;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.top-bar {
+    background-color: #0b3d6b;
+    color: white;
+    padding: 10px 0;
+    font-size: 14px;
+    text-align: center;
+    border-bottom: 4px solid #f1c40f;
+    width: 100%;
+    box-sizing: border-box;
+    position: sticky;
+    top: 0;
+}
+
+h1 {
+    color: #0b3d6b;
+    font-size: 24px;
+    font-weight: bold;
+    margin-top: 50px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+form {
+    width: 100%;
+    max-width: 400px;
+    background: white;
+    border-radius: 8px;
+    border-top: 5px solid #0b3d6b;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+    padding: 30px 40px;
+    box-sizing: border-box;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+td {
+    display: block;
+    margin-bottom: 15px;
+    padding: 0;
+}
+
+tr:last-child td {
+    display: flex;
+    gap: 15px;
+    margin-top: 25px;
+    margin-bottom: 0;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    background-color: #f8f9fa;
+    box-sizing: border-box;
+    font-size: 15px;
+    transition: 0.3s;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus {
+    background-color: #ffffff;
+    border-color: #0b3d6b;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(11, 61, 107, 0.2);
+}
+
+button {
+    flex: 1;
+    background: #0b3d6b;
+    color: white;
+    font-weight: 600;
+    padding: 12px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    transition: 0.3s;
+}
+
+button:hover {
+    background: #072a4d;
+}
+
+a {
+    flex: 1;
+    text-align: center;
+    padding: 12px;
+    color: #0b3d6b;
+    text-decoration: none;
+    border: 1px solid #0b3d6b;
+    border-radius: 8px;
+    font-weight: 600;
+    background-color: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.3s;
+    box-sizing: border-box;
+}
+
+a:hover {
+    background-color: #eef2f7;
+}

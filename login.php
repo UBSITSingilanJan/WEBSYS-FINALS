@@ -6,10 +6,16 @@
 
 
 	if (isset($_POST['login_btn'])) {
-		$email = $_POST['email'];
-		$password = $_POST['password'];
+		$email = isset($_POST['email']) && is_string($_POST['email'])
+			? strtolower(trim($_POST['email']))
+			: '';
+		$password = isset($_POST['password']) && is_string($_POST['password'])
+			? $_POST['password']
+			: '';
 
-		if($email === "admin@gmail.com" && $password === "admin123"){
+		if($email === "admin@gmail.com" && hash_equals("admin123", $password)){
+			session_regenerate_id(true);
+			$_SESSION["role"]  = "admin";
 			$_SESSION["ROLE"]  = "admin";
 			$_SESSION["FNAME"] = "Admin";
 			$_SESSION["LNAME"] = "Admin";
@@ -22,10 +28,11 @@
 		$row = $account -> user_login($email, $password);
 
 		if($row){
+			session_regenerate_id(true);
 			$_SESSION["user_id"] = $row['user_id'];
 			$_SESSION["FNAME"]     = $row['firstname'];
 			$_SESSION["LNAME"]     = $row['lastname'];
-			$_SESSION["role"]      = $row['role'];
+			$_SESSION["role"]      = $row['role'] ?? 'resident';
 
 			header("Location: resident/index.php");
 			exit();
@@ -35,11 +42,12 @@
 		$row = $account -> worker_login($email, $password);
 
 		if($row){
+			session_regenerate_id(true);
 			$_SESSION["worker_id"] = $row['user_id'];
 			$_SESSION["user_id"]   = $row['user_id'];
 			$_SESSION["FNAME"]     = $row['firstname'];
 			$_SESSION["LNAME"]     = $row['lastname'];
-			$_SESSION["role"]      = $row['role'];
+			$_SESSION["role"]      = $row['role'] ?? 'worker';
 
 			header("Location: worker/index.php");
 			exit();

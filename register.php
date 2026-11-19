@@ -28,10 +28,6 @@
 	<link rel="stylesheet" href="styles.css">
 </head>
 <body>
-	<div class="top-bar">
-		<strong>BENGUET</strong> | Baguio City
-	</div>
-
 	<h1>Financial Aid System Registration</h1>
 	<form method="post">
 		<table>

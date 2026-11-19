@@ -25,8 +25,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <title>Admin Dashboard</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="admin_styles.css">
+    <link rel="stylesheet" href="../theme.css">
 </head>
 
 <body>

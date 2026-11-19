@@ -16,26 +16,28 @@
 			display: flex;
 			flex-direction: column;
 			min-height: 100vh;
+			overflow: hidden;
 		}
 
-		.top-bar {
-			background-color: #0b3d6b; 
-			color: white;
-			padding: 10px 0;
-			font-size: 14px;
-			text-align: center;
-			border-bottom: 4px solid #f1c40f; 
-			flex-shrink: 0;
+		.container {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			min-height: 100vh;
+			padding: 16px;
+			box-sizing: border-box;
 		}
 
 		.login-card {
 			width: 100%;
 			max-width: 400px;
-			margin: 40px auto;
+			margin: 0;
 			background: white;
 			border-radius: 8px;
 			border-top: 5px solid #0b3d6b; 
 			box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+			max-height: 100%;
+			overflow-y: auto;
 		}
 
 		.btn-custom {
@@ -49,17 +51,43 @@
 		}
 
 		.login-card img {
-			width: 120px;
-			height: 120px;
+			width: 100px;
+			height: 100px;
 			object-fit: contain;
+		}
+
+		@media (max-height: 700px) {
+			.login-card img {
+				width: 70px;
+				height: 70px;
+			}
+			.login-card {
+				padding: 16px !important;
+			}
+			.login-card h5 {
+				font-size: 15px;
+			}
+			.login-card .mb-4 {
+				margin-bottom: 12px !important;
+			}
+		}
+
+		@media (max-height: 560px) {
+			.login-card img {
+				width: 50px;
+				height: 50px;
+			}
+			.login-card p {
+				display: none;
+			}
+			.login-card h5 {
+				font-size: 14px;
+				margin-top: 8px !important;
+			}
 		}
 	</style>
 </head>
 <body>
-
-	<div class="top-bar">
-		<strong>BENGUET</strong> | Baguio City
-	</div>
 
 	<div class="container">
 		<div class="card login-card p-4">

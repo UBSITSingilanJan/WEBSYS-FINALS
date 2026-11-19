@@ -42,7 +42,7 @@ if (is_array($resident)) {
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Resident Record</title>
-    <link rel="stylesheet" href="worker_style.css">
+    <link rel="stylesheet" href="../theme.css">
 </head>
 <body>
 <div class="dashboard">

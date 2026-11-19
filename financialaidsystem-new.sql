@@ -71,6 +71,22 @@ INSERT INTO `assistance_release` (`release_id`, `applicant_id`, `amount`, `relea
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `assistance_program`
+--
+
+CREATE TABLE `assistance_program` (
+  `program_id` int(11) NOT NULL AUTO_INCREMENT,
+  `program_name` varchar(150) NOT NULL,
+  `description` text NOT NULL,
+  `status` enum('Active','Inactive') NOT NULL DEFAULT 'Active',
+  `created_by` int(11) NOT NULL,
+  PRIMARY KEY (`program_id`),
+  UNIQUE KEY `unique_program_name` (`program_name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `resident_information`
 --
 
@@ -181,6 +197,63 @@ ALTER TABLE `resident_information`
 --
 ALTER TABLE `user`
   MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+ALTER TABLE `application`
+  ADD COLUMN `suffix` varchar(20) DEFAULT NULL,
+  ADD COLUMN `contact` varchar(20) DEFAULT NULL,
+  ADD COLUMN `gender` enum('Male','Female','Other') DEFAULT NULL,
+  ADD COLUMN `civilstatus` varchar(50) DEFAULT NULL,
+  ADD COLUMN `education` varchar(100) DEFAULT NULL,
+  ADD COLUMN `soloparent` varchar(20) DEFAULT NULL,
+  ADD COLUMN `children` varchar(20) DEFAULT NULL,
+  ADD COLUMN `member` varchar(255) DEFAULT NULL,
+  ADD COLUMN `program` varchar(255) DEFAULT NULL,
+  ADD COLUMN `dependent` varchar(100) DEFAULT NULL,
+  ADD COLUMN `relationship` varchar(100) DEFAULT NULL,
+  ADD COLUMN `housenumber` varchar(50) DEFAULT NULL,
+  ADD COLUMN `street` varchar(100) DEFAULT NULL,
+  ADD COLUMN `barangay` varchar(100) DEFAULT NULL,
+  ADD COLUMN `city` varchar(100) DEFAULT NULL,
+  ADD COLUMN `province` varchar(100) DEFAULT NULL,
+  ADD COLUMN `zipcode` varchar(20) DEFAULT NULL,
+  ADD COLUMN `birthplace` varchar(100) DEFAULT NULL,
+  ADD COLUMN `occupation` varchar(100) DEFAULT NULL,
+  ADD COLUMN `school` varchar(150) DEFAULT NULL,
+  ADD COLUMN `yearlevel` varchar(50) DEFAULT NULL,
+  ADD COLUMN `course` varchar(100) DEFAULT NULL,
+  ADD COLUMN `benefits` text DEFAULT NULL,
+  ADD COLUMN `enrolled` varchar(50) DEFAULT NULL,
+  ADD COLUMN `attained` varchar(100) DEFAULT NULL,
+  ADD COLUMN `senior` varchar(50) DEFAULT NULL,
+  ADD COLUMN `documents` text DEFAULT NULL,
+  ADD COLUMN `issues` text DEFAULT NULL;
+
+ALTER TABLE `resident_information`
+  MODIFY `firstname` varchar(100) DEFAULT NULL,
+  MODIFY `middlename` varchar(100) DEFAULT NULL,
+  MODIFY `lastname` varchar(100) DEFAULT NULL,
+  MODIFY `age` tinyint(3) DEFAULT NULL,
+  MODIFY `gender` enum('Male','Female','Other') DEFAULT NULL,
+  MODIFY `contact` varchar(11) DEFAULT NULL,
+  MODIFY `address` varchar(100) DEFAULT NULL,
+  ADD COLUMN `user_id` int(11) DEFAULT NULL,
+  ADD COLUMN `suffix` varchar(20) DEFAULT NULL,
+  ADD COLUMN `email` varchar(100) DEFAULT NULL,
+  ADD COLUMN `housenumber` varchar(50) DEFAULT NULL,
+  ADD COLUMN `street` varchar(100) DEFAULT NULL,
+  ADD COLUMN `barangay` varchar(100) DEFAULT NULL,
+  ADD COLUMN `city` varchar(100) DEFAULT NULL,
+  ADD COLUMN `province` varchar(100) DEFAULT NULL,
+  ADD COLUMN `zipcode` varchar(20) DEFAULT NULL,
+  ADD UNIQUE KEY `resident_information_user_id` (`user_id`);
+
+UPDATE `resident_information` ri
+JOIN `user` u
+  ON LOWER(ri.`firstname`) = LOWER(u.`firstname`)
+ AND LOWER(ri.`lastname`) = LOWER(u.`lastname`)
+SET ri.`user_id` = u.`user_id`
+WHERE ri.`user_id` IS NULL
+  AND u.`role` = 'resident';
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

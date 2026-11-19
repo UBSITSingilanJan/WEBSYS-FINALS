@@ -25,10 +25,7 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>Add Worker</title>
-	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
-
-	<link rel="stylesheet" href="admin_styles.css">
-	
+	<link rel="stylesheet" href="../theme.css">
 </head>
 <body>
 	<div class="dashboard">
@@ -42,7 +39,7 @@
 		<main class="main-content">
 			<div class="topbar">
 				<h2>Add Worker</h2>
-
+				<a href="index.php" class="search-clear">Back to Dashboard</a>
 			</div>
 
 			<div class="form-shell">

@@ -5,16 +5,13 @@ session_start();
 require_once "../dbconn.php";
 require_once "../classes/applicant.php";
 
-// Check if resident is logged in
 if (!isset($_SESSION['user_id'])) {
     header("Location: ../index.php");
     exit();
 }
 
-// Initialize Applicant class
 $conn = new Applicant($pdo);
 
-// Fetch applications belonging to the logged-in resident
 $applications = $conn->fetch_resident_applications($_SESSION['user_id']);
 ?>
 
@@ -27,15 +24,13 @@ $applications = $conn->fetch_resident_applications($_SESSION['user_id']);
 
     <title>Resident Dashboard</title>
 
-    <!-- External CSS -->
-    <link rel="stylesheet" href="resident_style.css">
+    <link rel="stylesheet" href="../theme.css">
 </head>
 
 <body>
 
 <div class="dashboard">
 
-    <!-- SIDEBAR -->
     <aside class="sidebar">
 
         <h3>Financial Aid System</h3>
@@ -47,15 +42,12 @@ $applications = $conn->fetch_resident_applications($_SESSION['user_id']);
 
     </aside>
 
-    <!-- MAIN CONTENT -->
     <main class="main-content">
 
-        <!-- TOPBAR -->
         <div class="topbar">
             <h2>My Aid Application</h2>
         </div>
 
-        <!-- APPLICATIONS -->
         <div class="content-grid">
 
             <section class="panel">

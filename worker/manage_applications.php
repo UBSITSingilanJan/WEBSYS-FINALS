@@ -170,8 +170,8 @@ unset($_SESSION['flash']);
     <title>Manage Applications</title>
 
     <!-- CSS Files -->
-    <link rel="stylesheet" href="worker_style.css">
-    <link rel="stylesheet" href="manage_applications.css">
+    <link rel="stylesheet" href="../theme.css">
+    <link rel="stylesheet" href=".css">
 
 </head>
 

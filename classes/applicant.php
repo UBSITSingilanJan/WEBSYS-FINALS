@@ -13,63 +13,87 @@
         }
 
         public function insert_data($firstname, $middlename, $lastname, $suffix, $contact, $email, $gender, $civilstatus, $education, $soloparent, $children, $member, $program, $dependent, $relationship, $housenumber, $street, $barangay, $city, $province, $zipcode, $birthplace, $occupation, $school, $yearlevel, $course, $benefits, $enrolled, $attained, $senior, $issues, $aid_type, $user_id, $documents){
-            $insert = "INSERT INTO application(
-                firstname, middlename, lastname, suffix, contact, email,
-                gender, civilstatus, education, soloparent, children,
-                member, program, dependent, relationship, housenumber,
-                street, barangay, city, province, zipcode, birthplace,
-                occupation, school, yearlevel, course, benefits, enrolled,
-                attained, senior, documents, issues, aid_type, user_id, status
-            )
-            VALUES(
-                :firstname, :middlename, :lastname, :suffix, :contact, :email,
-                :gender, :civilstatus, :education, :soloparent, :children,
-                :member, :program, :dependent, :relationship, :housenumber,
-                :street, :barangay, :city, :province, :zipcode, :birthplace,
-                :occupation, :school, :yearlevel, :course, :benefits, :enrolled,
-                :attained, :senior, :documents, :issues, :aid_type, :user_id, :status
-            )";
+            $this->pdo->beginTransaction();
 
-            $prep = $this->pdo->prepare($insert);
-            $prep->execute([
-                ":firstname" => $firstname,
-                ":middlename" => $middlename,
-                ":lastname" => $lastname,
-                ":suffix" => $suffix,
-                ":contact" => $contact,
-                ":email" => $email,
-                ":gender" => $gender,
-                ":civilstatus" => $civilstatus,
-                ":education" => $education,
-                ":soloparent" => $soloparent,
-                ":children" => $children,
-                ":member" => $member,
-                ":program" => $program,
-                ":dependent" => $dependent,
-                ":relationship" => $relationship,
-                ":housenumber" => $housenumber,
-                ":street" => $street,
-                ":barangay" => $barangay,
-                ":city" => $city,
-                ":province" => $province,
-                ":zipcode" => $zipcode,
-                ":birthplace" => $birthplace,
-                ":occupation" => $occupation,
-                ":school" => $school,
-                ":yearlevel" => $yearlevel,
-                ":course" => $course,
-                ":benefits" => $benefits,
-                ":enrolled" => $enrolled,
-                ":attained" => $attained,
-                ":senior" => $senior,
-                ":issues" => $issues,
-                ":aid_type" => $aid_type,
-                ":user_id" => $user_id,
-                ":documents" => $documents,
-                ":status" => "Pending",
-            ]);
+            try {
+                $insert = "INSERT INTO application(
+                    firstname, middlename, lastname, suffix, contact, email,
+                    gender, civilstatus, education, soloparent, children,
+                    member, program, dependent, relationship, housenumber,
+                    street, barangay, city, province, zipcode, birthplace,
+                    occupation, school, yearlevel, course, benefits, enrolled,
+                    attained, senior, issues, aid_type, user_id, status
+                )
+                VALUES(
+                    :firstname, :middlename, :lastname, :suffix, :contact, :email,
+                    :gender, :civilstatus, :education, :soloparent, :children,
+                    :member, :program, :dependent, :relationship, :housenumber,
+                    :street, :barangay, :city, :province, :zipcode, :birthplace,
+                    :occupation, :school, :yearlevel, :course, :benefits, :enrolled,
+                    :attained, :senior, :issues, :aid_type, :user_id, :status
+                )";
 
-            return $this->pdo->lastInsertId();
+                $prep = $this->pdo->prepare($insert);
+                $prep->execute([
+                    ":firstname" => $firstname,
+                    ":middlename" => $middlename,
+                    ":lastname" => $lastname,
+                    ":suffix" => $suffix,
+                    ":contact" => $contact,
+                    ":email" => $email,
+                    ":gender" => $gender,
+                    ":civilstatus" => $civilstatus,
+                    ":education" => $education,
+                    ":soloparent" => $soloparent,
+                    ":children" => $children,
+                    ":member" => $member,
+                    ":program" => $program,
+                    ":dependent" => $dependent,
+                    ":relationship" => $relationship,
+                    ":housenumber" => $housenumber,
+                    ":street" => $street,
+                    ":barangay" => $barangay,
+                    ":city" => $city,
+                    ":province" => $province,
+                    ":zipcode" => $zipcode,
+                    ":birthplace" => $birthplace,
+                    ":occupation" => $occupation,
+                    ":school" => $school,
+                    ":yearlevel" => $yearlevel,
+                    ":course" => $course,
+                    ":benefits" => $benefits,
+                    ":enrolled" => $enrolled,
+                    ":attained" => $attained,
+                    ":senior" => $senior,
+                    ":issues" => $issues,
+                    ":aid_type" => $aid_type,
+                    ":user_id" => $user_id,
+                    ":status" => "Pending",
+                ]);
+
+                $applicantId = $this->pdo->lastInsertId();
+                $documentInsert = $this->pdo->prepare(
+                    "INSERT INTO application_document
+                     (applicant_id, original_name, mime_type, file_data)
+                     VALUES (:applicant_id, :original_name, :mime_type, :file_data)"
+                );
+
+                foreach ($documents as $document) {
+                    $documentInsert->bindValue(':applicant_id', $applicantId, PDO::PARAM_INT);
+                    $documentInsert->bindValue(':original_name', $document['original_name']);
+                    $documentInsert->bindValue(':mime_type', $document['mime_type']);
+                    $documentInsert->bindValue(':file_data', $document['file_data'], PDO::PARAM_LOB);
+                    $documentInsert->execute();
+                }
+
+                $this->pdo->commit();
+                return $applicantId;
+            } catch (PDOException $exception) {
+                if ($this->pdo->inTransaction()) {
+                    $this->pdo->rollBack();
+                }
+                throw $exception;
+            }
         }
 
         public function fetch_data(){
@@ -126,6 +150,7 @@
                         ri.lastname,
                         ri.suffix,
                         ri.contact,
+                        ri.gender,
                         u.email,
                         ri.housenumber,
                         ri.street,

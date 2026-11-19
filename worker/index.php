@@ -11,15 +11,18 @@
     }
     require_once "../dbconn.php";
     require_once "../classes/applicant.php";
+    require_once "../classes/application_manager.php";
     require_once "../classes/resident.php";
 
     $conn = new Applicant($pdo);
+    $applicationManager = new ApplicationManager($pdo);
     $residentConn = new Resident($pdo);
     $rows = $conn->fetch_data();
 
     $totalApplicants = $conn->count_applicants();
     $totalBenefits = $conn->count_benefits();
     $totalResidents = $residentConn->count_residents();
+    $totalReleased = $applicationManager->total_released_amount();
     $recentApplicants = array_slice($rows, 0, 4);
 
 ?>
@@ -116,6 +119,18 @@
 
                 <h1>
                     <?php echo $totalBenefits['total']; ?>
+                </h1>
+
+            </div>
+
+
+            <!-- Total Released Amount -->
+            <div class="stat-card">
+
+                <p>Total Released Amount</p>
+
+                <h1>
+                    ₱<?php echo number_format((float)$totalReleased, 2); ?>
                 </h1>
 
             </div>

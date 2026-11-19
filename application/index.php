@@ -1,14 +1,31 @@
 <?php
     session_start();
 
+    if (
+        !isset($_SESSION['user_id']) ||
+        (int)$_SESSION['user_id'] <= 0 ||
+        !isset($_SESSION['role']) ||
+        $_SESSION['role'] !== 'resident'
+    ) {
+        header("Location: ../index.php");
+        exit();
+    }
+
     require_once "../dbconn.php";
     require_once "../classes/applicant.php";
+    require_once "../classes/program_manager.php";
 
     $conn = new Applicant($pdo);
+    $programManager = new ProgramManager($pdo);
+    $activePrograms = $programManager->fetch_active_programs();
 
-    $user_id = $_SESSION['user_id'];
+    $user_id = (int)$_SESSION['user_id'];
 
     $row = $conn->fetch_profile_data($user_id);
+    if (!$row) {
+        http_response_code(400);
+        exit("Please complete your resident profile before applying.");
+    }
 
     $upload_error = null;
 
@@ -45,19 +62,27 @@
         $attained = $_POST['attained'];
         $senior = json_encode($_POST['senior'] ?? []);
         $issues = $_POST['issues'];
-        $aid_type = $_POST['aid_type'];
+        $aid_type = isset($_POST['aid_type']) && is_string($_POST['aid_type'])
+            ? trim($_POST['aid_type'])
+            : "";
 
         $uploaded_files = [];
-        $upload_dir = __DIR__ . "/../uploads/applications/";
-
-        if (!is_dir($upload_dir) && !mkdir($upload_dir, 0755, true) && !is_dir($upload_dir)) {
-            $upload_error = "The upload directory could not be created.";
+        if (!$programManager->is_active_program($aid_type)) {
+            $upload_error = "Select an active assistance program.";
         }
 
         $documents_upload = $_FILES['documents'] ?? null;
         if (
             $upload_error === null &&
-            (!is_array($documents_upload) || !isset($documents_upload['error']) || !is_array($documents_upload['error']))
+            (
+                !is_array($documents_upload) ||
+                !isset($documents_upload['error'], $documents_upload['name'], $documents_upload['tmp_name'], $documents_upload['size']) ||
+                !is_array($documents_upload['error']) ||
+                !is_array($documents_upload['name']) ||
+                !is_array($documents_upload['tmp_name']) ||
+                !is_array($documents_upload['size']) ||
+                count($documents_upload['error']) === 0
+            )
         ) {
             $upload_error = "Please select at least one supporting document.";
         }
@@ -79,7 +104,13 @@
 
                 $tmp_name = $documents_upload['tmp_name'][$key] ?? '';
                 $file_size = $documents_upload['size'][$key] ?? 0;
-                if (!is_uploaded_file($tmp_name) || $file_size > 5 * 1024 * 1024) {
+                if (
+                    !is_string($tmp_name) ||
+                    !is_uploaded_file($tmp_name) ||
+                    !is_numeric($file_size) ||
+                    (int)$file_size <= 0 ||
+                    (int)$file_size > 5 * 1024 * 1024
+                ) {
                     $upload_error = "Each supporting document must be a valid file no larger than 5 MB.";
                     break;
                 }
@@ -90,19 +121,34 @@
                     break;
                 }
 
-                $new_name = 'application_' . bin2hex(random_bytes(16)) . '.' . $allowed_types[$file_type];
-                if (!move_uploaded_file($tmp_name, $upload_dir . $new_name)) {
-                    $upload_error = "A supporting document could not be saved.";
+                $fileData = file_get_contents($tmp_name);
+                if ($fileData === false) {
+                    $upload_error = "A supporting document could not be read.";
                     break;
                 }
 
-                $uploaded_files[] = "uploads/applications/" . $new_name;
+                $originalName = $documents_upload['name'][$key] ?? '';
+                if (!is_string($originalName)) {
+                    $upload_error = "A supporting document has an invalid filename.";
+                    break;
+                }
+
+                $originalName = basename(str_replace('\\', '/', $originalName));
+                $originalName = preg_replace('/[\x00-\x1F\x7F]/', '', $originalName);
+                $originalName = substr(trim($originalName), 0, 255);
+                if ($originalName === '') {
+                    $originalName = 'document.' . $allowed_types[$file_type];
+                }
+
+                $uploaded_files[] = [
+                    'original_name' => $originalName,
+                    'mime_type' => $file_type,
+                    'file_data' => $fileData,
+                ];
             }
         }
 
         if ($upload_error === null && count($uploaded_files) > 0) {
-            $documents = json_encode($uploaded_files);
-
             $conn->insert_data(
                 $firstname, $middlename, $lastname, $suffix,
                 $contact, $email, $gender, $civilstatus, $education,
@@ -110,19 +156,13 @@
                 $relationship, $housenumber, $street, $barangay,
                 $city, $province, $zipcode, $birthplace, $occupation,
                 $school, $yearlevel, $course, $benefits, $enrolled,
-                $attained, $senior, $issues, $aid_type, $user_id, $documents
+                $attained, $senior, $issues, $aid_type, $user_id, $uploaded_files
             );
 
             header("Location: ../resident/index.php");
             exit();
         }
 
-        foreach ($uploaded_files as $uploaded_file) {
-            $file_path = __DIR__ . "/../" . $uploaded_file;
-            if (is_file($file_path)) {
-                unlink($file_path);
-            }
-        }
     }
 ?>
 <!DOCTYPE html>
@@ -146,45 +186,33 @@
         <table>
 
             <tr>
-                <td>
-                    <input type="text" name="firstname" value="<?= htmlspecialchars($row['firstname'] ?? '') ?>" readonly>
-                </td>
-            </tr>
-
-            <tr>
-                <td>
-                    <input type="text" name="middlename" value="<?= htmlspecialchars($row['middlename'] ?? '') ?>" readonly>
-                </td>
-            </tr>
-
-            <tr>
-                <td>
-                    <input type="text" name="lastname" value="<?= htmlspecialchars($row['lastname'] ?? '') ?>" readonly>
-                </td>
-            </tr>
-
-            <tr>
-                <td>
-                    <input type="text" name="suffix" value="<?= htmlspecialchars($row['suffix'] ?? '') ?>" readonly>
-                </td>
-            </tr>
-
-            <tr>
-                <td>
-                    <input type="tel" name="contact" value="<?= htmlspecialchars($row['contact'] ?? '') ?>" readonly>
-                </td>
-            </tr>
-
-            <tr>
-                <td>
-                    <input type="email" name="email" value="<?= htmlspecialchars($row['email'] ?? '') ?>" readonly>
+                <td colspan="2">
+                    <fieldset>
+                        <legend>Applicant information</legend>
+                        <p>
+                            Name:
+                            <?= htmlspecialchars(
+                                trim(
+                                    ($row['firstname'] ?? '') . ' ' .
+                                    ($row['middlename'] ?? '') . ' ' .
+                                    ($row['lastname'] ?? '') . ' ' .
+                                    ($row['suffix'] ?? '')
+                                ),
+                                ENT_QUOTES,
+                                'UTF-8'
+                            ) ?>
+                        </p>
+                        <p>Email: <?= htmlspecialchars($row['email'] ?? '', ENT_QUOTES, 'UTF-8') ?></p>
+                        <p>Contact: <?= htmlspecialchars($row['contact'] ?? '', ENT_QUOTES, 'UTF-8') ?></p>
+                        <p>Your identity is taken from your resident account.</p>
+                    </fieldset>
                 </td>
             </tr>
 
             <tr>
                 <td>
                     <select name="gender" class="form-control" required>
-                        <option value="" disabled selected>Gender</option>
+                        <option value="" disabled <?= empty($row['gender']) ? 'selected' : '' ?>>Gender</option>
                         <option value="Male" <?= ($row['gender'] ?? '') == 'Male' ? 'selected' : '' ?>>Male</option>
                         <option value="Female" <?= ($row['gender'] ?? '') == 'Female' ? 'selected' : '' ?>>Female</option>
                         <option value="Other" <?= ($row['gender'] ?? '') == 'Other' ? 'selected' : '' ?>>Other</option>
@@ -306,16 +334,30 @@
             <tr>
                 <td>
                     <select name="aid_type" required>
-                        <option value="Financial Aid">Financial Aid</option>
-                        <option value="Scholarship">Scholarship</option>
+                        <option value="" disabled selected>Select assistance program</option>
+                        <?php foreach ($activePrograms as $activeProgram) { ?>
+                            <option value="<?= htmlspecialchars($activeProgram['program_name'], ENT_QUOTES, 'UTF-8') ?>">
+                                <?= htmlspecialchars($activeProgram['program_name'], ENT_QUOTES, 'UTF-8') ?>
+                            </option>
+                        <?php } ?>
                     </select>
+                    <?php if (empty($activePrograms)) { ?>
+                        <p role="status">There are no active assistance programs available right now.</p>
+                    <?php } ?>
                 </td>
             </tr>
 
             <tr>
                 <td>
                     <h4>Upload Supporting Documents</h4>
-                    <input type="file" name="documents[]" multiple accept="image/*,.pdf" required>
+                    <p>Upload JPEG, PNG, WebP, or PDF files (up to 5 MB each).</p>
+                    <input
+                        type="file"
+                        name="documents[]"
+                        multiple
+                        accept=".jpg,.jpeg,.png,.webp,.pdf"
+                        required
+                    >
                 </td>
             </tr>
 
@@ -325,7 +367,7 @@
                 </td>
 
                 <td>
-                    <button type="submit" name="apply_btn">
+                    <button type="submit" name="apply_btn" <?= empty($activePrograms) ? 'disabled' : '' ?>>
                         Apply
                     </button>
                 </td>

@@ -150,6 +150,9 @@ $openApplicantId = filter_var(
 );
 
 $applicants = $manager->fetch_applications($search);
+$applicationDocuments = $manager->fetch_application_documents(
+    array_column($applicants, 'applicant_id')
+);
 $releases = $manager->fetch_recent_releases();
 $counts = $manager->count_applications();
 
@@ -328,6 +331,9 @@ unset($_SESSION['flash']);
                             <th>Email</th>
                             <th>Program</th>
                             <th>Status</th>
+                            <th>Submitted Documents</th>
+                            <th>Previous Requests</th>
+                            <th>Other Pending / Approved Aid</th>
                             <th>Total Released</th>
                             <th>Update Status</th>
                             <th>Record Assistance</th>
@@ -352,6 +358,21 @@ unset($_SESSION['flash']);
                                 $statusClass = strtolower(
                                     $applicant['status']
                                 );
+
+                                $previousRequests = [];
+                                if (!empty($applicant['previous_requests'])) {
+                                    foreach (explode('||', $applicant['previous_requests']) as $request) {
+                                        $requestParts = explode('::', $request, 2);
+                                        if (count($requestParts) === 2) {
+                                            $previousRequests[] = [
+                                                'aid_type' => $requestParts[0],
+                                                'status' => $requestParts[1],
+                                            ];
+                                        }
+                                    }
+                                }
+
+                                $documents = $applicationDocuments[(int)$applicant['applicant_id']] ?? [];
 
                                 $releaseDate = $hasRelease
                                     ? $applicant['latest_release_date']
@@ -409,6 +430,94 @@ unset($_SESSION['flash']);
                                             <?php echo e($applicant['status']); ?>
 
                                         </span>
+
+                                    </td>
+
+
+                                    <!-- SUBMITTED DOCUMENTS -->
+                                    <td>
+
+                                        <?php if (!empty($documents)) { ?>
+
+                                            <details class="application-documents">
+
+                                                <summary>View documents (<?php echo count($documents); ?>)</summary>
+
+                                                <ul>
+                                                    <?php foreach ($documents as $document) { ?>
+                                                        <li>
+                                                            <a
+                                                                href="view_application_document.php?applicant_id=<?php echo (int)$applicant['applicant_id']; ?><?php if ($document['document_id'] !== null) { ?>&amp;document_id=<?php echo (int)$document['document_id']; ?><?php } else { ?>&amp;legacy_index=<?php echo (int)$document['legacy_index']; ?><?php } ?>"
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                            >
+                                                                <?php echo e($document['filename']); ?>
+                                                            </a>
+                                                        </li>
+                                                    <?php } ?>
+                                                </ul>
+
+                                            </details>
+
+                                        <?php } else { ?>
+
+                                            <span class="history-empty">No documents</span>
+
+                                        <?php } ?>
+
+                                    </td>
+
+
+                                    <!-- PREVIOUS REQUESTS -->
+                                    <td>
+
+                                        <?php if (!empty($previousRequests)) { ?>
+
+                                            <details class="beneficiary-history">
+
+                                                <summary>
+                                                    View history
+                                                    (<?php echo (int)$applicant['previous_request_count']; ?>)
+                                                </summary>
+
+                                                <ul>
+                                                    <?php foreach ($previousRequests as $request) { ?>
+                                                        <?php $historyStatusClass = strtolower($request['status']); ?>
+                                                        <li>
+                                                            <?php echo e($request['aid_type']); ?>
+                                                            <span class="status-badge status-<?php echo e($historyStatusClass); ?>">
+                                                                <?php echo e($request['status']); ?>
+                                                            </span>
+                                                        </li>
+                                                    <?php } ?>
+                                                </ul>
+
+                                            </details>
+
+                                        <?php } else { ?>
+
+                                            <span class="history-empty">No previous requests</span>
+
+                                        <?php } ?>
+
+                                    </td>
+
+
+                                    <!-- OTHER ACTIVE AID -->
+                                    <td>
+
+                                        <?php if ((int)$applicant['other_active_aid_count'] > 0) { ?>
+
+                                            <span class="active-aid-indicator">
+                                                Yes
+                                                (<?php echo (int)$applicant['other_active_aid_count']; ?>)
+                                            </span>
+
+                                        <?php } else { ?>
+
+                                            <span class="history-empty">No</span>
+
+                                        <?php } ?>
 
                                     </td>
 
@@ -636,7 +745,7 @@ unset($_SESSION['flash']);
 
                             <tr>
 
-                                <td colspan="7" class="empty-message">
+                                <td colspan="10" class="empty-message">
                                     No applicants found.
                                 </td>
 

@@ -27,7 +27,7 @@
 }
 
 .management-table {
-    min-width: 1050px;
+    min-width: 1460px;
 }
 
 .management-table th,
@@ -57,6 +57,70 @@
 .status-rejected {
     background: #fee2e2;
     color: #991b1b;
+}
+
+.beneficiary-history summary {
+    color: #2563eb;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.application-documents summary {
+    color: #2563eb;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.application-documents ul {
+    min-width: 140px;
+    padding: 8px 0 0 18px;
+    margin: 0;
+}
+
+.application-documents li {
+    padding: 5px 0;
+    font-size: 12px;
+}
+
+.application-documents a {
+    color: #2563eb;
+    text-decoration: none;
+}
+
+.application-documents a:hover {
+    text-decoration: underline;
+}
+
+.beneficiary-history ul {
+    min-width: 190px;
+    padding: 8px 0 0 18px;
+    margin: 0;
+}
+
+.beneficiary-history li {
+    padding: 5px 0;
+    font-size: 12px;
+}
+
+.history-empty {
+    color: #777;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.active-aid-indicator {
+    display: inline-block;
+    padding: 5px 9px;
+    border-radius: 20px;
+    background: #fff3cd;
+    color: #856404;
+    font-size: 11px;
+    font-weight: bold;
+    white-space: nowrap;
 }
 
 .amount-cell {

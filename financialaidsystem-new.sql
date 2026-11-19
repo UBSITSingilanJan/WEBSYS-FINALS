@@ -33,8 +33,9 @@ CREATE TABLE `application` (
   `middlename` varchar(100) NOT NULL,
   `lastname` varchar(100) NOT NULL,
   `email` varchar(100) NOT NULL,
-  `aid_type` enum('Financial Aid','Scholarship') NOT NULL,
+  `aid_type` varchar(150) NOT NULL,
   `user_id` int(11) DEFAULT NULL,
+  `documents` text DEFAULT NULL,
   `status` varchar(20) NOT NULL DEFAULT 'Pending'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -150,6 +151,20 @@ ALTER TABLE `application`
   ADD PRIMARY KEY (`applicant_id`),
   ADD KEY `application_user_id` (`user_id`);
 
+CREATE TABLE `application_document` (
+  `document_id` int(11) NOT NULL AUTO_INCREMENT,
+  `applicant_id` int(11) NOT NULL,
+  `original_name` varchar(255) NOT NULL,
+  `mime_type` varchar(100) NOT NULL,
+  `file_data` longblob NOT NULL,
+  `uploaded_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`document_id`),
+  KEY `application_document_applicant_id` (`applicant_id`),
+  CONSTRAINT `application_document_applicant_fk`
+    FOREIGN KEY (`applicant_id`) REFERENCES `application` (`applicant_id`)
+    ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 --
 -- Indexes for table `assistance_release`
 --
@@ -199,6 +214,9 @@ ALTER TABLE `user`
   MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 ALTER TABLE `application`
+  MODIFY `aid_type` varchar(150) NOT NULL;
+
+ALTER TABLE `application`
   ADD COLUMN `suffix` varchar(20) DEFAULT NULL,
   ADD COLUMN `contact` varchar(20) DEFAULT NULL,
   ADD COLUMN `gender` enum('Male','Female','Other') DEFAULT NULL,
@@ -225,7 +243,6 @@ ALTER TABLE `application`
   ADD COLUMN `enrolled` varchar(50) DEFAULT NULL,
   ADD COLUMN `attained` varchar(100) DEFAULT NULL,
   ADD COLUMN `senior` varchar(50) DEFAULT NULL,
-  ADD COLUMN `documents` text DEFAULT NULL,
   ADD COLUMN `issues` text DEFAULT NULL;
 
 ALTER TABLE `resident_information`

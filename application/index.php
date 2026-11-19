@@ -133,11 +133,11 @@
 
     <title>Apply for Financial Aid</title>
 
-	<link rel="stylesheet" href="application_style.css">
+	<link rel="stylesheet" href="../theme.css">
     
 </head>
 
-<body>
+<body class="register-page">
 
     <h1>Financial Aid Application</h1>
     <?php if ($upload_error !== null): ?>
@@ -243,21 +243,37 @@
             </tr>
 
             <tr>
-                <td><input type="text" name="housenumber" class="form-control" value="<?= htmlspecialchars($row['housenumber'] ?? '') ?>" readonly></td>
-                <td><input type="text" name="street" class="form-control" value="<?= htmlspecialchars($row['street'] ?? '') ?>" readonly></td>
+                <td>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" name="housenumber" class="form-control" value="<?= htmlspecialchars($row['housenumber'] ?? '') ?>" placeholder="House No." readonly>
+                        <input type="text" name="street" class="form-control" value="<?= htmlspecialchars($row['street'] ?? '') ?>" placeholder="Street" readonly>
+                    </div>
+                </td>
             </tr>
             <tr>
-                <td><input type="text" name="barangay" class="form-control" value="<?= htmlspecialchars($row['barangay'] ?? '') ?>" readonly></td>
-                <td><input type="text" name="city" class="form-control" value="<?= htmlspecialchars($row['city'] ?? '') ?>" readonly></td>
+                <td>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" name="barangay" class="form-control" value="<?= htmlspecialchars($row['barangay'] ?? '') ?>" placeholder="Barangay" readonly>
+                        <input type="text" name="city" class="form-control" value="<?= htmlspecialchars($row['city'] ?? '') ?>" placeholder="City" readonly>
+                    </div>
+                </td>
             </tr>
             <tr>
-                <td><input type="text" name="province" class="form-control" value="<?= htmlspecialchars($row['province'] ?? '') ?>" readonly></td>
-                <td><input type="text" name="zipcode" class="form-control" value="<?= htmlspecialchars($row['zipcode'] ?? '') ?>" readonly></td>
+                <td>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" name="province" class="form-control" value="<?= htmlspecialchars($row['province'] ?? '') ?>" placeholder="Province" readonly>
+                        <input type="text" name="zipcode" class="form-control" value="<?= htmlspecialchars($row['zipcode'] ?? '') ?>" placeholder="Zipcode" readonly>
+                    </div>
+                </td>
             </tr>
 
             <tr>
-                <td><input type="text" name="birthplace" class="form-control" placeholder="Place of Birth" required></td>
-                <td><input type="text" name="occupation" class="form-control" placeholder="Occupation" required></td>
+                <td>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" name="birthplace" class="form-control" placeholder="Place of Birth" required>
+                        <input type="text" name="occupation" class="form-control" placeholder="Occupation" required>
+                    </div>
+                </td>
             </tr>
 
             <tr>
@@ -280,8 +296,10 @@
             <tr>
                 <td>
                 <h4>For out of school youth</h4>
-                <input type="text" name="enrolled" class="form-control" placeholder="Last Year Enrolled">
-                <input type="text" name="attained" class="form-control" placeholder="Last Year Attained">
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" name="enrolled" class="form-control" placeholder="Last Year Enrolled">
+                    <input type="text" name="attained" class="form-control" placeholder="Last Year Attained">
+                </div>
             </td>
             </tr>
 
@@ -323,11 +341,8 @@
             </tr>
 
             <tr>
-                <td>
+                <td style="display: flex; flex-direction: row; gap: 15px; justify-content: flex-end; width: 100%;">
                     <a href="../resident/index.php">Cancel</a>
-                </td>
-
-                <td>
                     <button type="submit" name="apply_btn">
                         Apply
                     </button>

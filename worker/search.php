@@ -24,6 +24,10 @@ if ($search !== '') {
 </head>
 <body>
 <div class="dashboard">
+
+    <input type="checkbox" id="sidebar-toggle" class="sidebar-toggle">
+    <label for="sidebar-toggle" class="hamburger">☰</label>
+
     <aside class="sidebar">
         <h3>Financial Aid System</h3>
         <a href="index.php">Dashboard</a>

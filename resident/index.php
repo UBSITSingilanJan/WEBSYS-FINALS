@@ -30,6 +30,9 @@ $applications = $conn->fetch_resident_applications($_SESSION['user_id']);
 <body>
 
 <div class="dashboard">
+    
+    <input type="checkbox" id="sidebar-toggle" class="sidebar-toggle">
+    <label for="sidebar-toggle" class="hamburger">☰</label>
 
     <aside class="sidebar">
 

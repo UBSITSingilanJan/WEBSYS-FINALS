@@ -1,0 +1,129 @@
+
+/* APPLICATION PAGE */
+
+.application-panel {
+    width: 100%;
+    padding: 28px;
+}
+
+.application-heading {
+    margin-bottom: 28px;
+}
+
+.application-heading h3 {
+    font-size: 23px;
+    margin-bottom: 7px;
+}
+
+.application-heading p {
+    color: #777;
+    font-size: 14px;
+}
+
+.application-panel .form-group {
+    margin-bottom: 20px;
+}
+
+.application-panel .form-group label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 9px;
+}
+
+.application-panel .form-control {
+    width: 100%;
+    height: 57px;
+    padding: 15px 18px;
+    border: 1px solid #aaa;
+    border-radius: 8px;
+    background-color: white;
+    font-size: 15px;
+    color: #333;
+    outline: none;
+}
+
+.application-panel .form-control:focus {
+    border-color: #555;
+}
+
+.application-panel select.form-control {
+    cursor: pointer;
+}
+
+.application-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+    margin-top: 28px;
+}
+
+.application-actions .btn-primary,
+.application-actions .btn-secondary {
+    min-height: 50px;
+    padding: 14px 22px;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 7px;
+}
+
+.application-actions .btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.application-error {
+    padding: 13px 16px;
+    margin-bottom: 20px;
+    border: 1px solid #f5c2c7;
+    border-radius: 7px;
+    background: #f8d7da;
+    color: #842029;
+    font-size: 14px;
+}
+
+.no-program-message {
+    margin-top: 9px;
+    color: #842029;
+    font-size: 13px;
+}
+
+.page-subtitle {
+    margin-top: 6px;
+    color: #777;
+    font-size: 14px;
+}
+
+/* RESPONSIVE DESIGN */
+
+@media (max-width: 900px) {
+    .application-panel {
+        padding: 22px;
+    }
+}
+
+@media (max-width: 600px) {
+    .application-panel {
+        padding: 18px;
+    }
+
+    .application-heading h3 {
+        font-size: 19px;
+    }
+
+    .application-panel .form-control {
+        height: 50px;
+    }
+
+    .application-actions {
+        flex-direction: column-reverse;
+        align-items: stretch;
+    }
+
+    .application-actions .btn-primary,
+    .application-actions .btn-secondary {
+        width: 100%;
+        text-align: center;
+    }
+}

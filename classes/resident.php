@@ -29,13 +29,12 @@
 			]);
 		}
 
-		public function show_update_data($user_id){
-		    $fetch = "SELECT * FROM resident_information WHERE user_id = ?";
+		public function show_update_data($resident_id){
+			$fetch = "SELECT FROM resident_information WHERE resident_id = :resident_id";
 
-		    $prep = $this->pdo->prepare($fetch);
-		    $prep->execute([$user_id]);
-
-		    return $prep->fetch();
+			$prep = $this -> pdo -> prepare($fetch);
+			$prep -> execute();
+			return $prep -> fetch();
 		}
 
 		public function fetch_data(){

@@ -179,19 +179,12 @@ unset($_SESSION['flash']);
 
 <div class="dashboard">
 
-    <!-- SIDEBAR -->
     <aside class="sidebar">
-
         <h3>Financial Aid System</h3>
-
         <a href="index.php">Dashboard</a>
-
-        <a href="manage_applications.php" class="active">
-            Manage Applications
-        </a>
-
+        <a href="manage_applications.php" class="active">Manage Applications</a>
+        <a href="manage_programs.php">Add Programs</a>
         <a href="logout.php">Logout</a>
-
     </aside>
 
 

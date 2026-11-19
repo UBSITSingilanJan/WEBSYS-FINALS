@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 16, 2026 at 03:01 PM
+-- Generation Time: Nov 19, 2026 at 05:58 AM
 -- Server version: 10.11.16-MariaDB
 -- PHP Version: 8.3.36
 
@@ -33,7 +33,7 @@ CREATE TABLE `application` (
   `middlename` varchar(100) NOT NULL,
   `lastname` varchar(100) NOT NULL,
   `email` varchar(100) NOT NULL,
-  `aid_type` enum('Financial Aid','Scholarship') NOT NULL,
+  `aid_type` varchar(150) NOT NULL,
   `user_id` int(11) DEFAULT NULL,
   `status` varchar(20) NOT NULL DEFAULT 'Pending'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -43,8 +43,34 @@ CREATE TABLE `application` (
 --
 
 INSERT INTO `application` (`applicant_id`, `firstname`, `middlename`, `lastname`, `email`, `aid_type`, `user_id`, `status`) VALUES
-(6, 'Jan', 'B', 'Singilan', 'jansingilan@gmail.com', 'Financial Aid', 1, 'Approved'),
-(7, 'Chris', 'T', 'Offer', 'christoffer@gmail.com', 'Scholarship', NULL, 'Approved');
+(6, 'Jan', 'B', 'Singilan', 'jansingilan@gmail.com', 'Financial Aid', 1, 'Rejected'),
+(7, 'Chris', 'T', 'Offer', 'christoffer@gmail.com', 'Scholarship', NULL, 'Approved'),
+(8, 'Marc', 'C', 'Soledad', 'marcsoledad@gmail.com', 'Financial Aid', 3, 'Approved'),
+(9, 'Marc', 'Q', 'Soledad', 'marcsoledad@gmail.com', '', 3, 'Pending');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `assistance_program`
+--
+
+CREATE TABLE `assistance_program` (
+  `program_id` int(11) NOT NULL,
+  `program_name` varchar(150) NOT NULL,
+  `description` text NOT NULL,
+  `status` enum('Active','Inactive') NOT NULL DEFAULT 'Active',
+  `created_by` int(11) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `assistance_program`
+--
+
+INSERT INTO `assistance_program` (`program_id`, `program_name`, `description`, `status`, `created_by`, `created_at`, `updated_at`) VALUES
+(1, 'Pera para sa bayan', 'Bigyan kita money', 'Active', 5, '2026-11-18 16:33:29', '2026-11-18 16:33:29'),
+(2, 'Cash Assistance', 'Scholarship for student', 'Active', 5, '2026-11-18 17:12:11', '2026-11-18 17:12:11');
 
 -- --------------------------------------------------------
 
@@ -57,16 +83,18 @@ CREATE TABLE `assistance_release` (
   `applicant_id` int(11) NOT NULL,
   `amount` decimal(10,2) NOT NULL,
   `release_date` date NOT NULL,
-  `remarks` varchar(255) DEFAULT NULL
+  `remarks` varchar(255) DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `assistance_release`
 --
 
-INSERT INTO `assistance_release` (`release_id`, `applicant_id`, `amount`, `release_date`, `remarks`) VALUES
-(2, 7, 45.00, '2026-11-16', NULL),
-(3, 6, 45.00, '2026-11-16', NULL);
+INSERT INTO `assistance_release` (`release_id`, `applicant_id`, `amount`, `release_date`, `remarks`, `is_active`) VALUES
+(2, 7, 45.00, '2026-11-16', NULL, 1),
+(3, 6, 45.00, '2026-11-16', NULL, 0),
+(4, 8, 123.00, '2026-11-18', NULL, 1);
 
 -- --------------------------------------------------------
 
@@ -135,6 +163,12 @@ ALTER TABLE `application`
   ADD KEY `application_user_id` (`user_id`);
 
 --
+-- Indexes for table `assistance_program`
+--
+ALTER TABLE `assistance_program`
+  ADD PRIMARY KEY (`program_id`);
+
+--
 -- Indexes for table `assistance_release`
 --
 ALTER TABLE `assistance_release`
@@ -162,13 +196,19 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT for table `application`
 --
 ALTER TABLE `application`
-  MODIFY `applicant_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `applicant_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
+--
+-- AUTO_INCREMENT for table `assistance_program`
+--
+ALTER TABLE `assistance_program`
+  MODIFY `program_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `assistance_release`
 --
 ALTER TABLE `assistance_release`
-  MODIFY `release_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `release_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `resident_information`

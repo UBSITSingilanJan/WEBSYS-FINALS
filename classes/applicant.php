@@ -7,9 +7,28 @@
             $this -> pdo = $pdo;
         }
 
-        public function insert_data($firstname, $middlename, $lastname, $suffix, $contact, $email, $gender, $civilstatus, $education, $soloparent, $children, $member, $program, $dependent, $relationship, $housenumber, $street, $barangay, $city, $province, $zipcode, $birthplace, $occupation, $school, $yearlevel, $course, $benefits, $enrolled, $attained, $senior, $issues, $aid_type, $user_id){
-            $insert = "INSERT INTO application(firstname, middlename, lastname, suffix, contact, email, gender, civilstatus, education, soloparent, children, member, program, dependent, relationship, housenumber, street, barangay, city, province, zipcode, birthplace, occupation, school, yearlevel, course, benefits, enrolled, attained, senior, issues, aid_type, user_id, status)
-                       VALUES(:firstname, :middlename, :lastname, :suffix, :contact, :email, :gender, :civilstatus, :education, :soloparent, :children, :member, :program, :dependent, :relationship, :housenumber, :street, :barangay, :city, :province, :zipcode, :birthplace, :occupation, :school, :yearlevel, :course, :benefits, :enrolled, :attained, :senior, :issues, :aid_type, :user_id, :status)";
+        private function format_selections($value){
+            $decoded = json_decode($value ?? '', true);
+            return is_array($decoded) ? implode(", ", $decoded) : (string)($value ?? '');
+        }
+
+        public function insert_data($firstname, $middlename, $lastname, $suffix, $contact, $email, $gender, $civilstatus, $education, $soloparent, $children, $member, $program, $dependent, $relationship, $housenumber, $street, $barangay, $city, $province, $zipcode, $birthplace, $occupation, $school, $yearlevel, $course, $benefits, $enrolled, $attained, $senior, $issues, $aid_type, $user_id, $documents){
+            $insert = "INSERT INTO application(
+                firstname, middlename, lastname, suffix, contact, email,
+                gender, civilstatus, education, soloparent, children,
+                member, program, dependent, relationship, housenumber,
+                street, barangay, city, province, zipcode, birthplace,
+                occupation, school, yearlevel, course, benefits, enrolled,
+                attained, senior, documents, issues, aid_type, user_id, status
+            )
+            VALUES(
+                :firstname, :middlename, :lastname, :suffix, :contact, :email,
+                :gender, :civilstatus, :education, :soloparent, :children,
+                :member, :program, :dependent, :relationship, :housenumber,
+                :street, :barangay, :city, :province, :zipcode, :birthplace,
+                :occupation, :school, :yearlevel, :course, :benefits, :enrolled,
+                :attained, :senior, :documents, :issues, :aid_type, :user_id, :status
+            )";
 
             $prep = $this->pdo->prepare($insert);
             $prep->execute([
@@ -46,6 +65,7 @@
                 ":issues" => $issues,
                 ":aid_type" => $aid_type,
                 ":user_id" => $user_id,
+                ":documents" => $documents,
                 ":status" => "Pending",
             ]);
 
@@ -54,9 +74,17 @@
 
         public function fetch_data(){
             $fetch = "SELECT * FROM application";
-            $prep = $this -> pdo -> prepare($fetch);
-            $prep -> execute();
-            return $prep -> fetchAll();
+            $prep = $this->pdo->prepare($fetch);
+            $prep->execute();
+
+            $rows = $prep->fetchAll(PDO::FETCH_ASSOC);
+
+            foreach ($rows as &$row) {
+                $row['benefits'] = $this->format_selections($row['benefits'] ?? null);
+                $row['senior'] = $this->format_selections($row['senior'] ?? null);
+            }
+
+            return $rows;
         }
 
         public function count_applicants(){
@@ -76,12 +104,19 @@
         public function fetch_resident_applications($user_id){
             $fetch = "SELECT * FROM application WHERE user_id = :user_id";
 
-            $prep = $this -> pdo -> prepare($fetch);
-            $prep -> execute([
+            $prep = $this->pdo->prepare($fetch);
+            $prep->execute([
                 ":user_id" => $user_id,
             ]);
 
-            return $prep -> fetchAll();
+            $rows = $prep->fetchAll(PDO::FETCH_ASSOC);
+
+            foreach ($rows as &$row) {
+                $row['benefits'] = $this->format_selections($row['benefits'] ?? null);
+                $row['senior'] = $this->format_selections($row['senior'] ?? null);
+            }
+
+            return $rows;
         }
 
         public function fetch_profile_data($user_id){

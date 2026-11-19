@@ -56,6 +56,10 @@
             Manage Applications
         </a>
 
+        <a href="manage_programs.php">
+            Manage Programs
+        </a>
+
         <a href="logout.php">
             Logout
         </a>

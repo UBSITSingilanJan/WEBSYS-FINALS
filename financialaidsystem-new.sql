@@ -71,6 +71,22 @@ INSERT INTO `assistance_release` (`release_id`, `applicant_id`, `amount`, `relea
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `assistance_program`
+--
+
+CREATE TABLE `assistance_program` (
+  `program_id` int(11) NOT NULL AUTO_INCREMENT,
+  `program_name` varchar(150) NOT NULL,
+  `description` text NOT NULL,
+  `status` enum('Active','Inactive') NOT NULL DEFAULT 'Active',
+  `created_by` int(11) NOT NULL,
+  PRIMARY KEY (`program_id`),
+  UNIQUE KEY `unique_program_name` (`program_name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `resident_information`
 --
 
@@ -209,6 +225,7 @@ ALTER TABLE `application`
   ADD COLUMN `enrolled` varchar(50) DEFAULT NULL,
   ADD COLUMN `attained` varchar(100) DEFAULT NULL,
   ADD COLUMN `senior` varchar(50) DEFAULT NULL,
+  ADD COLUMN `documents` text DEFAULT NULL,
   ADD COLUMN `issues` text DEFAULT NULL;
 
 ALTER TABLE `resident_information`

@@ -235,13 +235,26 @@ unset($_SESSION['flash']);
 
 <div class="dashboard">
 
-
     <aside class="sidebar">
+
         <h3>Financial Aid System</h3>
-        <a href="index.php">Dashboard</a>
-        <a href="manage_programs.php" class="active">Add Program</a>
-        <a href="manage_applications.php">Manage Applications</a>
-        <a href="logout.php">Logout</a>
+
+        <a href="index.php" class="active">
+            Dashboard
+        </a>
+
+        <a href="manage_applications.php">
+            Manage Applications
+        </a>
+
+        <a href="manage_programs.php">
+            Manage Programs
+        </a>
+
+        <a href="logout.php">
+            Logout
+        </a>
+
     </aside>
 
     <main class="main-content">

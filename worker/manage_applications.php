@@ -184,13 +184,21 @@ unset($_SESSION['flash']);
 
         <h3>Financial Aid System</h3>
 
-        <a href="index.php">Dashboard</a>
+        <a href="index.php" class="active">
+            Dashboard
+        </a>
 
-        <a href="manage_applications.php" class="active">
+        <a href="manage_applications.php">
             Manage Applications
         </a>
 
-        <a href="logout.php">Logout</a>
+        <a href="manage_programs.php">
+            Manage Programs
+        </a>
+
+        <a href="logout.php">
+            Logout
+        </a>
 
     </aside>
 

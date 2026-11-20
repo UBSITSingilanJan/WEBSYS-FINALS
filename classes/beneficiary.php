@@ -37,11 +37,11 @@ class Beneficiary {
 
     public function aid_history($resident_id) {
         $prep = $this->pdo->prepare(
-            "SELECT program, amount_or_goods, release_date, mode_of_receipt,
-                    released_by, received_by, acknowledged
-             FROM aid_distribution
-             WHERE resident_id = :id
-             ORDER BY release_date DESC, distribution_id DESC"
+            "SELECT a.aid_type AS program, r.amount, r.release_date, r.remarks
+             FROM assistance_release r
+             INNER JOIN application a ON a.applicant_id = r.applicant_id
+             WHERE a.resident_id = :id
+             ORDER BY r.release_date DESC, r.release_id DESC"
         );
         $prep->execute([':id' => $resident_id]);
         return $prep->fetchAll(PDO::FETCH_ASSOC);
@@ -50,7 +50,10 @@ class Beneficiary {
     
     public function has_received($resident_id) {
         $prep = $this->pdo->prepare(
-            "SELECT COUNT(*) FROM aid_distribution WHERE resident_id = :id"
+            "SELECT COUNT(*)
+             FROM assistance_release r
+             INNER JOIN application a ON a.applicant_id = r.applicant_id
+             WHERE a.resident_id = :id"
         );
         $prep->execute([':id' => $resident_id]);
         return (int)$prep->fetchColumn() > 0;

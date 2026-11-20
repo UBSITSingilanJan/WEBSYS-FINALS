@@ -85,6 +85,48 @@ class ApplicationManager {
         ]);
     }
 
+    public function link_application_to_resident($applicant_id, $resident_id) {
+        $check = $this->pdo->prepare(
+            "SELECT a.user_id, a.resident_id, ri.resident_id AS matched_resident_id,
+                    ri.user_id AS resident_user_id
+             FROM application a
+             LEFT JOIN resident_information ri ON ri.resident_id = :resident_id
+             WHERE a.applicant_id = :applicant_id"
+        );
+        $check->execute([
+            ':resident_id' => $resident_id,
+            ':applicant_id' => $applicant_id,
+        ]);
+        $application = $check->fetch(PDO::FETCH_ASSOC);
+
+        if (
+            !$application ||
+            $application['matched_resident_id'] === null ||
+            $application['resident_id'] !== null ||
+            (
+                $application['user_id'] !== null &&
+                (
+                    $application['resident_user_id'] === null ||
+                    (int)$application['user_id'] !== (int)$application['resident_user_id']
+                )
+            )
+        ) {
+            return false;
+        }
+
+        $update = $this->pdo->prepare(
+            "UPDATE application
+             SET resident_id = :resident_id
+             WHERE applicant_id = :applicant_id AND resident_id IS NULL"
+        );
+        $update->execute([
+            ':resident_id' => $resident_id,
+            ':applicant_id' => $applicant_id,
+        ]);
+
+        return $update->rowCount() === 1;
+    }
+
     /*
      * CREATE FIRST RELEASE
      */
@@ -189,10 +231,12 @@ class ApplicationManager {
 
         $sql = "SELECT
                     a.applicant_id,
+                    a.resident_id,
                     a.firstname,
                     a.middlename,
                     a.lastname,
                     a.email,
+                    a.application_date,
                     a.aid_type,
                     a.status,
 
@@ -202,6 +246,7 @@ class ApplicationManager {
                         WHERE previous_application.applicant_id <> a.applicant_id
                         AND (
                             (a.user_id IS NOT NULL AND previous_application.user_id = a.user_id)
+                            OR (a.resident_id IS NOT NULL AND previous_application.resident_id = a.resident_id)
                             OR previous_application.email = a.email
                         )
                     ) AS previous_request_count,
@@ -216,6 +261,7 @@ class ApplicationManager {
                         WHERE previous_application.applicant_id <> a.applicant_id
                         AND (
                             (a.user_id IS NOT NULL AND previous_application.user_id = a.user_id)
+                            OR (a.resident_id IS NOT NULL AND previous_application.resident_id = a.resident_id)
                             OR previous_application.email = a.email
                         )
                     ) AS previous_requests,
@@ -227,6 +273,7 @@ class ApplicationManager {
                         AND previous_application.status IN ('Pending', 'Approved')
                         AND (
                             (a.user_id IS NOT NULL AND previous_application.user_id = a.user_id)
+                            OR (a.resident_id IS NOT NULL AND previous_application.resident_id = a.resident_id)
                             OR previous_application.email = a.email
                         )
                     ) AS other_active_aid_count,
@@ -494,6 +541,30 @@ class ApplicationManager {
                 WHERE a.status <> 'Rejected'
                 ORDER BY r.release_id DESC
                 LIMIT 10";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function fetch_all_releases() {
+        $sql = "SELECT
+                    r.release_id,
+                    r.applicant_id,
+                    r.amount,
+                    r.release_date,
+                    r.remarks,
+                    a.resident_id,
+                    a.aid_type,
+                    COALESCE(
+                        NULLIF(TRIM(CONCAT_WS(' ', ri.firstname, ri.middlename, ri.lastname)), ''),
+                        NULLIF(TRIM(CONCAT_WS(' ', a.firstname, a.middlename, a.lastname)), '')
+                    ) AS resident_name
+                FROM assistance_release r
+                INNER JOIN application a ON a.applicant_id = r.applicant_id
+                LEFT JOIN resident_information ri ON ri.resident_id = a.resident_id
+                ORDER BY r.release_date DESC, r.release_id DESC";
 
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute();

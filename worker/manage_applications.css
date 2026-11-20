@@ -136,6 +136,42 @@
     min-width: 190px;
 }
 
+.resident-link-form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 6px;
+    margin: 15px 0;
+}
+
+.resident-link-form label {
+    display: grid;
+    gap: 4px;
+    color: #777;
+    font-size: 11px;
+    min-width: 230px;
+}
+
+.resident-link-form select {
+    max-width: 360px;
+    min-height: 34px;
+    padding: 7px;
+    border: 1px solid #d0d5dd;
+    border-radius: 6px;
+    font-size: 12px;
+}
+
+.resident-link-form button {
+    min-height: 34px;
+    padding: 7px 10px;
+    border: 0;
+    border-radius: 6px;
+    background: #2563eb;
+    color: #fff;
+    font-size: 12px;
+    cursor: pointer;
+}
+
 .form-control {
     padding: 8px 9px;
     border: 1px solid #d0d5dd;

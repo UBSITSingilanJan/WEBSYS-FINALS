@@ -13,8 +13,10 @@ if (
 
 require_once "../dbconn.php";
 require_once "../classes/application_manager.php";
+require_once "../classes/resident.php";
 
 $manager = new ApplicationManager($pdo);
+$residentManager = new Resident($pdo);
 
 // Escape output
 function e($value) {
@@ -59,6 +61,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (!$applicant_id || $applicant_id <= 0) {
         $_SESSION['flash'] = "Invalid applicant record.";
+        redirect_page();
+    }
+
+    if ($action === "link_resident") {
+        $resident_id = filter_var(
+            $_POST['resident_id'] ?? null,
+            FILTER_VALIDATE_INT
+        );
+
+        if (
+            !$resident_id ||
+            $resident_id <= 0 ||
+            !$manager->link_application_to_resident($applicant_id, $resident_id)
+        ) {
+            $_SESSION['flash'] = "Unable to link this application to that resident. Verify the record and account association.";
+        } else {
+            $_SESSION['flash'] = "Application linked to the resident profile.";
+        }
+
         redirect_page();
     }
 
@@ -150,6 +171,12 @@ $openApplicantId = filter_var(
 );
 
 $applicants = $manager->fetch_applications($search);
+$unlinkedApplications = array_values(array_filter($applicants, function ($applicant) {
+    return empty($applicant['resident_id']);
+}));
+$residentRecords = $unlinkedApplications
+    ? $residentManager->fetch_data()
+    : [];
 $applicationDocuments = $manager->fetch_application_documents(
     array_column($applicants, 'applicant_id')
 );
@@ -182,28 +209,7 @@ unset($_SESSION['flash']);
 
 <div class="dashboard">
 
-    <!-- SIDEBAR -->
-    <aside class="sidebar">
-
-        <h3>Financial Aid System</h3>
-
-        <a href="index.php" class="active">
-            Dashboard
-        </a>
-
-        <a href="manage_applications.php">
-            Manage Applications
-        </a>
-
-        <a href="manage_programs.php">
-            Manage Programs
-        </a>
-
-        <a href="logout.php">
-            Logout
-        </a>
-
-    </aside>
+    <?php $activePage = 'applications'; require __DIR__ . '/sidebar.php'; ?>
 
 
     <!-- MAIN CONTENT -->
@@ -227,7 +233,7 @@ unset($_SESSION['flash']);
         <!-- NOTIFICATION -->
         <?php if ($flash !== "") { ?>
 
-            <div class="alert-message">
+            <div class="alert-message" role="status">
                 <?php echo e($flash); ?>
             </div>
 
@@ -238,46 +244,23 @@ unset($_SESSION['flash']);
         <div class="stats-container">
 
             <div class="stat-card">
-
                 <p>Total Applicants</p>
-
-                <h1>
-                    <?php echo (int)($counts['total'] ?? 0); ?>
-                </h1>
-
+                <h1><?php echo (int)($counts['total'] ?? 0); ?></h1>
             </div>
 
-
             <div class="stat-card">
-
                 <p>Pending Applications</p>
-
-                <h1>
-                    <?php echo (int)($counts['pending'] ?? 0); ?>
-                </h1>
-
+                <h1><?php echo (int)($counts['pending'] ?? 0); ?></h1>
             </div>
 
-
             <div class="stat-card">
-
                 <p>Approved Applications</p>
-
-                <h1>
-                    <?php echo (int)($counts['approved'] ?? 0); ?>
-                </h1>
-
+                <h1><?php echo (int)($counts['approved'] ?? 0); ?></h1>
             </div>
 
-
             <div class="stat-card">
-
                 <p>Rejected Applications</p>
-
-                <h1>
-                    <?php echo (int)($counts['rejected'] ?? 0); ?>
-                </h1>
-
+                <h1><?php echo (int)($counts['rejected'] ?? 0); ?></h1>
             </div>
 
         </div>
@@ -318,6 +301,52 @@ unset($_SESSION['flash']);
 
             </form>
 
+            <?php if ($unlinkedApplications) { ?>
+                <form method="post" class="resident-link-form">
+                    <input type="hidden" name="action" value="link_resident">
+                    <input type="hidden" name="q" value="<?php echo e($search); ?>">
+                    <label>
+                        Unlinked application
+                        <select name="applicant_id" required>
+                            <option value="">Select application</option>
+                            <?php foreach ($unlinkedApplications as $unlinkedApplication) { ?>
+                                <option value="<?php echo e($unlinkedApplication['applicant_id']); ?>">
+                                    #<?php echo e($unlinkedApplication['applicant_id']); ?> —
+                                    <?php echo e(trim(
+                                        $unlinkedApplication['firstname'] . " " .
+                                        $unlinkedApplication['middlename'] . " " .
+                                        $unlinkedApplication['lastname']
+                                    )); ?>
+                                    (<?php echo e($unlinkedApplication['aid_type']); ?>)
+                                </option>
+                            <?php } ?>
+                        </select>
+                    </label>
+                    <label>
+                        Existing resident
+                        <select name="resident_id" required>
+                            <option value="">Select resident</option>
+                            <?php foreach ($residentRecords as $residentRecord) { ?>
+                                <option value="<?php echo e($residentRecord['resident_id']); ?>">
+                                    #<?php echo e($residentRecord['resident_id']); ?> —
+                                    <?php echo e(trim(
+                                        ($residentRecord['firstname'] ?? '') . " " .
+                                        ($residentRecord['middlename'] ?? '') . " " .
+                                        ($residentRecord['lastname'] ?? '')
+                                    )); ?>
+                                    <?php if (!empty($residentRecord['contact'])) { ?>
+                                        — <?php echo e($residentRecord['contact']); ?>
+                                    <?php } ?>
+                                    <?php if (!empty($residentRecord['address'])) { ?>
+                                        — <?php echo e($residentRecord['address']); ?>
+                                    <?php } ?>
+                                </option>
+                            <?php } ?>
+                        </select>
+                    </label>
+                    <button type="submit">Link Application</button>
+                </form>
+            <?php } ?>
 
             <div class="table-wrapper">
 
@@ -328,6 +357,7 @@ unset($_SESSION['flash']);
                         <tr>
 
                             <th>Applicant</th>
+                            <th>Application Date</th>
                             <th>Email</th>
                             <th>Program</th>
                             <th>Status</th>
@@ -386,19 +416,33 @@ unset($_SESSION['flash']);
                                     <td>
 
                                         <strong>
-
+                                            <?php if (!empty($applicant['resident_id'])) { ?>
+                                                <a href="resident_management.php?edit=<?php echo urlencode((string)$applicant['resident_id']); ?>">
+                                            <?php } ?>
                                             <?php
-
-                                            echo e(
+                                            echo e(trim(
                                                 $applicant['firstname'] . " " .
                                                 $applicant['middlename'] . " " .
                                                 $applicant['lastname']
-                                            );
-
+                                            ));
                                             ?>
-
+                                            <?php if (!empty($applicant['resident_id'])) { ?>
+                                                </a>
+                                                <small>Resident #<?php echo e($applicant['resident_id']); ?></small>
+                                            <?php } else { ?>
+                                                <small>Resident profile not linked</small>
+                                            <?php } ?>
                                         </strong>
 
+                                    </td>
+
+                                    <td>
+                                        <?php
+                                        $applicationDate = $applicant['application_date'] ?? '';
+                                        echo $applicationDate !== ''
+                                            ? e(date('M j, Y', strtotime($applicationDate)))
+                                            : 'N/A';
+                                        ?>
                                     </td>
 
 
@@ -555,10 +599,10 @@ unset($_SESSION['flash']);
                                                 name="q"
                                                 value="<?php echo e($search); ?>"
                                             >
-
                                             <select
                                                 name="status"
                                                 class="form-control status-select"
+                                                aria-label="Update status for <?php echo e(trim($applicant['firstname'] . ' ' . $applicant['lastname'])); ?>"
                                                 required
                                             >
 
@@ -663,13 +707,13 @@ unset($_SESSION['flash']);
                                                         value="<?php echo e($search); ?>"
                                                     >
 
-
                                                     <!-- AMOUNT -->
                                                     <label>Amount (₱)</label>
 
                                                     <input
                                                         type="number"
                                                         name="amount"
+                                                        aria-label="Release amount for <?php echo e(trim($applicant['firstname'] . ' ' . $applicant['lastname'])); ?>"
                                                         min="0.01"
                                                         max="99999999.99"
                                                         step="0.01"
@@ -689,6 +733,7 @@ unset($_SESSION['flash']);
                                                     <input
                                                         type="date"
                                                         name="release_date"
+                                                        aria-label="Release date for <?php echo e(trim($applicant['firstname'] . ' ' . $applicant['lastname'])); ?>"
                                                         value="<?php echo e($releaseDate); ?>"
                                                         required
                                                     >
@@ -699,6 +744,7 @@ unset($_SESSION['flash']);
 
                                                     <textarea
                                                         name="remarks"
+                                                        aria-label="Release remarks for <?php echo e(trim($applicant['firstname'] . ' ' . $applicant['lastname'])); ?>"
                                                         rows="2"
                                                         maxlength="255"
                                                         placeholder="Optional remarks"
@@ -745,7 +791,7 @@ unset($_SESSION['flash']);
 
                             <tr>
 
-                                <td colspan="10" class="empty-message">
+                                <td colspan="11" class="empty-message">
                                     No applicants found.
                                 </td>
 

@@ -235,27 +235,7 @@ unset($_SESSION['flash']);
 
 <div class="dashboard">
 
-    <aside class="sidebar">
-
-        <h3>Financial Aid System</h3>
-
-        <a href="index.php" class="active">
-            Dashboard
-        </a>
-
-        <a href="manage_applications.php">
-            Manage Applications
-        </a>
-
-        <a href="manage_programs.php">
-            Manage Programs
-        </a>
-
-        <a href="logout.php">
-            Logout
-        </a>
-
-    </aside>
+    <?php $activePage = 'programs'; require __DIR__ . '/sidebar.php'; ?>
 
     <main class="main-content">
 

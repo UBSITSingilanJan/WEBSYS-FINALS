@@ -12,7 +12,7 @@
             return is_array($decoded) ? implode(", ", $decoded) : (string)($value ?? '');
         }
 
-        public function insert_data($firstname, $middlename, $lastname, $suffix, $contact, $email, $gender, $civilstatus, $education, $soloparent, $children, $member, $program, $dependent, $relationship, $housenumber, $street, $barangay, $city, $province, $zipcode, $birthplace, $occupation, $school, $yearlevel, $course, $benefits, $enrolled, $attained, $senior, $issues, $aid_type, $user_id, $documents){
+        public function insert_data($firstname, $middlename, $lastname, $suffix, $contact, $email, $gender, $civilstatus, $education, $soloparent, $children, $member, $program, $dependent, $relationship, $housenumber, $street, $barangay, $city, $province, $zipcode, $birthplace, $occupation, $school, $yearlevel, $course, $benefits, $enrolled, $attained, $senior, $issues, $aid_type, $resident_id, $user_id, $documents){
             $this->pdo->beginTransaction();
 
             try {
@@ -22,7 +22,7 @@
                     member, program, dependent, relationship, housenumber,
                     street, barangay, city, province, zipcode, birthplace,
                     occupation, school, yearlevel, course, benefits, enrolled,
-                    attained, senior, issues, aid_type, user_id, status
+                    attained, senior, issues, aid_type, resident_id, user_id, status
                 )
                 VALUES(
                     :firstname, :middlename, :lastname, :suffix, :contact, :email,
@@ -30,7 +30,7 @@
                     :member, :program, :dependent, :relationship, :housenumber,
                     :street, :barangay, :city, :province, :zipcode, :birthplace,
                     :occupation, :school, :yearlevel, :course, :benefits, :enrolled,
-                    :attained, :senior, :issues, :aid_type, :user_id, :status
+                    :attained, :senior, :issues, :aid_type, :resident_id, :user_id, :status
                 )";
 
                 $prep = $this->pdo->prepare($insert);
@@ -67,6 +67,7 @@
                     ":senior" => $senior,
                     ":issues" => $issues,
                     ":aid_type" => $aid_type,
+                    ":resident_id" => $resident_id,
                     ":user_id" => $user_id,
                     ":status" => "Pending",
                 ]);
@@ -145,6 +146,7 @@
 
         public function fetch_profile_data($user_id){
             $fetch = "SELECT
+                        ri.resident_id,
                         ri.firstname,
                         ri.middlename,
                         ri.lastname,

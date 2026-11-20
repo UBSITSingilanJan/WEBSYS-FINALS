@@ -156,7 +156,7 @@
                 $relationship, $housenumber, $street, $barangay,
                 $city, $province, $zipcode, $birthplace, $occupation,
                 $school, $yearlevel, $course, $benefits, $enrolled,
-                $attained, $senior, $issues, $aid_type, $user_id, $uploaded_files
+                $attained, $senior, $issues, $aid_type, $row['resident_id'], $user_id, $uploaded_files
             );
 
             header("Location: ../resident/index.php");

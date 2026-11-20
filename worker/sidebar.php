@@ -1,0 +1,19 @@
+<?php
+$activePage = $activePage ?? '';
+$navigation = [
+    'dashboard' => ['index.php', 'Dashboard'],
+    'residents' => ['resident_management.php', 'Resident Masterlist'],
+    'applications' => ['manage_applications.php', 'Manage Applications'],
+    'programs' => ['manage_programs.php', 'Manage Programs'],
+    'distributions' => ['distributions.php', 'Distributions'],
+    'logout' => ['logout.php', 'Logout'],
+];
+?>
+<aside class="sidebar">
+    <h3>Financial Aid System</h3>
+    <?php foreach ($navigation as $page => $item): ?>
+        <a href="<?php echo htmlspecialchars($item[0], ENT_QUOTES, 'UTF-8'); ?>"<?php echo $activePage === $page ? ' class="active"' : ''; ?>>
+            <?php echo htmlspecialchars($item[1], ENT_QUOTES, 'UTF-8'); ?>
+        </a>
+    <?php endforeach; ?>
+</aside>

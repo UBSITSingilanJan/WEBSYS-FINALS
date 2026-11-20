@@ -316,6 +316,23 @@ $postedAidType = is_string($postedApplication['aid_type'] ?? null) ? trim($poste
         .resident-actions a { background: #666; }
         .resident-search { display: flex; gap: 10px; margin-bottom: 16px; }
         .resident-notice { margin-bottom: 15px; padding: 12px; border-radius: 5px; background: #fff3cd; color: #664d03; }
+        .resident-table { width: 100%; min-width: 0; table-layout: fixed; }
+        .resident-table th, .resident-table td { padding: 8px; white-space: normal; overflow-wrap: anywhere; font-size: 12px; }
+        .resident-table th { font-size: 11px; }
+        .resident-table td:last-child a { display: block; width: 100%; margin: 0 0 5px; padding: 6px; text-align: center; white-space: normal; font-size: 11px; }
+        @media (max-width: 900px) {
+            .resident-table, .resident-table tbody { display: block; width: 100%; }
+            .resident-table colgroup { display: none; }
+            .resident-table thead { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+            .resident-table tbody tr { display: block; margin-bottom: 12px; padding: 4px 10px; border: 1px solid #e6ebf1; border-radius: 8px; }
+            .resident-table tbody td { display: grid; grid-template-columns: minmax(110px, 34%) minmax(0, 1fr); gap: 10px; width: 100%; padding: 9px 0; border-bottom: 1px solid #eef1f5; }
+            .resident-table tbody td::before { content: attr(data-label); color: #6b7c8f; font-size: 10px; font-weight: 600; text-transform: uppercase; }
+            .resident-table tbody td.empty-message { display: block; text-align: center; }
+            .resident-table tbody td.empty-message::before { content: none; }
+        }
+        @media (max-width: 480px) {
+            .resident-table tbody td { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+        }
         @media (max-width: 600px) { .resident-form { grid-template-columns: 1fr; } .resident-form .full-width { grid-column: auto; } }
     </style>
 </head>
@@ -342,22 +359,31 @@ $postedAidType = is_string($postedApplication['aid_type'] ?? null) ? trim($poste
 
             <?php if ($search !== '' || !$formOpen): ?>
                 <div class="table-wrapper">
-                    <table class="applicant-table">
-                        <thead><tr><th>Resident ID</th><th>Name</th><th>Age</th><th>Contact</th><th>Address</th><th>Aid Status</th><th>Actions</th></tr></thead>
+                    <table class="applicant-table resident-table">
+                        <colgroup>
+                            <col style="width: 11%">
+                            <col style="width: 15%">
+                            <col style="width: 6%">
+                            <col style="width: 13%">
+                            <col style="width: 22%">
+                            <col style="width: 14%">
+                            <col style="width: 19%">
+                        </colgroup>
+                        <thead><tr><th scope="col">Resident ID</th><th scope="col">Name</th><th scope="col">Age</th><th scope="col">Contact</th><th scope="col">Address</th><th scope="col">Aid Status</th><th scope="col">Actions</th></tr></thead>
                         <tbody>
                         <?php foreach ($residents as $item): ?>
                             <tr>
-                                <td><?php echo $escape($item['resident_id']); ?></td>
-                                <td><?php echo $escape(trim(implode(' ', array_filter([$item['firstname'], $item['middlename'], $item['lastname'], $item['suffix']])))); ?></td>
-                                <td><?php echo $escape($item['age'] ?? ''); ?></td>
-                                <td><?php echo $escape($item['contact'] ?? ''); ?></td>
-                                <td><?php echo $escape($item['address'] ?? ''); ?></td>
-                                <td>
+                                <td data-label="Resident ID"><?php echo $escape($item['resident_id']); ?></td>
+                                <td data-label="Name"><?php echo $escape(trim(implode(' ', array_filter([$item['firstname'], $item['middlename'], $item['lastname'], $item['suffix']])))); ?></td>
+                                <td data-label="Age"><?php echo $escape($item['age'] ?? ''); ?></td>
+                                <td data-label="Contact"><?php echo $escape($item['contact'] ?? ''); ?></td>
+                                <td data-label="Address"><?php echo $escape($item['address'] ?? ''); ?></td>
+                                <td data-label="Aid Status">
                                     <span class="badge <?php echo !empty($item['has_received_aid']) ? 'badge-yes' : 'badge-no'; ?>">
                                         <?php echo !empty($item['has_received_aid']) ? 'Received aid' : 'No aid record'; ?>
                                     </span>
                                 </td>
-                                <td>
+                                <td data-label="Actions">
                                     <a class="resident-link" href="resident_management.php?edit=<?php echo urlencode((string)$item['resident_id']); ?>">View / Edit</a>
                                     <a class="open-record-btn" href="resident_record.php?id=<?php echo urlencode((string)$item['resident_id']); ?>">Aid History</a>
                                 </td>

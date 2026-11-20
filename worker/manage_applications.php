@@ -201,7 +201,10 @@ unset($_SESSION['flash']);
 
     <!-- CSS Files -->
     <link rel="stylesheet" href="../theme.css">
-    <link rel="stylesheet" href="manage_applications.css">
+    <link
+        rel="stylesheet"
+        href="manage_applications.css?v=<?php echo filemtime(__DIR__ . '/manage_applications.css'); ?>"
+    >
 
 </head>
 
@@ -209,31 +212,7 @@ unset($_SESSION['flash']);
 
 <div class="dashboard">
 
-    <input type="checkbox" id="sidebar-toggle" class="sidebar-toggle">
-    <label for="sidebar-toggle" class="hamburger">☰</label>
-    
-    <aside class="sidebar">
-
-        <h3>Financial Aid System</h3>
-
-        <a href="index.php">
-            Dashboard
-        </a>
-
-        <a href="manage_applications.php" class="active">
-            Manage Applications
-        </a>
-
-        <a href="manage_programs.php">
-            Manage Programs
-        </a>
-
-        <a href="logout.php">
-            Logout
-        </a>
-
-    </aside>
-
+    <?php $activePage = 'applications'; require __DIR__ . '/sidebar.php'; ?>
 
     <!-- MAIN CONTENT -->
     <main class="main-content">
@@ -375,21 +354,35 @@ unset($_SESSION['flash']);
 
                 <table class="applicant-table management-table">
 
+                    <colgroup>
+                        <col style="width: 12%">
+                        <col style="width: 8%">
+                        <col style="width: 12%">
+                        <col style="width: 7%">
+                        <col style="width: 7%">
+                        <col style="width: 9%">
+                        <col style="width: 9%">
+                        <col style="width: 9%">
+                        <col style="width: 7%">
+                        <col style="width: 10%">
+                        <col style="width: 10%">
+                    </colgroup>
+
                     <thead>
 
                         <tr>
 
-                            <th>Applicant</th>
-                            <th>Application Date</th>
-                            <th>Email</th>
-                            <th>Program</th>
-                            <th>Status</th>
-                            <th>Submitted Documents</th>
-                            <th>Previous Requests</th>
-                            <th>Other Pending / Approved Aid</th>
-                            <th>Total Released</th>
-                            <th>Update Status</th>
-                            <th>Record Assistance</th>
+                            <th scope="col">Applicant</th>
+                            <th scope="col">Application Date</th>
+                            <th scope="col">Email</th>
+                            <th scope="col">Program</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Submitted Documents</th>
+                            <th scope="col">Previous Requests</th>
+                            <th scope="col">Other Pending / Approved Aid</th>
+                            <th scope="col">Total Released</th>
+                            <th scope="col">Update Status</th>
+                            <th scope="col">Record Assistance</th>
 
                         </tr>
 
@@ -436,7 +429,7 @@ unset($_SESSION['flash']);
                                 <tr>
 
                                     <!-- APPLICANT NAME -->
-                                    <td>
+                                    <td data-label="Applicant">
 
                                         <strong>
                                             <?php if (!empty($applicant['resident_id'])) { ?>
@@ -459,7 +452,7 @@ unset($_SESSION['flash']);
 
                                     </td>
 
-                                    <td>
+                                    <td data-label="Application Date">
                                         <?php
                                         $applicationDate = $applicant['application_date'] ?? '';
                                         echo $applicationDate !== ''
@@ -470,7 +463,7 @@ unset($_SESSION['flash']);
 
 
                                     <!-- EMAIL -->
-                                    <td>
+                                    <td data-label="Email">
 
                                         <?php echo e($applicant['email']); ?>
 
@@ -478,7 +471,7 @@ unset($_SESSION['flash']);
 
 
                                     <!-- PROGRAM -->
-                                    <td>
+                                    <td data-label="Program">
 
                                         <span class="benefit-badge">
 
@@ -490,7 +483,7 @@ unset($_SESSION['flash']);
 
 
                                     <!-- STATUS -->
-                                    <td>
+                                    <td data-label="Status">
 
                                         <span class="status-badge status-<?php echo e($statusClass); ?>">
 
@@ -502,7 +495,7 @@ unset($_SESSION['flash']);
 
 
                                     <!-- SUBMITTED DOCUMENTS -->
-                                    <td>
+                                    <td data-label="Submitted Documents">
 
                                         <?php if (!empty($documents)) { ?>
 
@@ -536,7 +529,7 @@ unset($_SESSION['flash']);
 
 
                                     <!-- PREVIOUS REQUESTS -->
-                                    <td>
+                                    <td data-label="Previous Requests">
 
                                         <?php if (!empty($previousRequests)) { ?>
 
@@ -571,7 +564,7 @@ unset($_SESSION['flash']);
 
 
                                     <!-- OTHER ACTIVE AID -->
-                                    <td>
+                                    <td data-label="Other Pending / Approved Aid">
 
                                         <?php if ((int)$applicant['other_active_aid_count'] > 0) { ?>
 
@@ -590,7 +583,7 @@ unset($_SESSION['flash']);
 
 
                                     <!-- TOTAL RELEASED -->
-                                    <td class="amount-cell">
+                                    <td class="amount-cell" data-label="Total Released">
 
                                         ₱<?php echo number_format(
                                             (float)$applicant['total_released'],
@@ -601,7 +594,7 @@ unset($_SESSION['flash']);
 
 
                                     <!-- UPDATE STATUS -->
-                                    <td>
+                                    <td data-label="Update Status">
 
                                         <form method="POST" class="action-form">
 
@@ -666,7 +659,7 @@ unset($_SESSION['flash']);
 
 
                                     <!-- ADD / EDIT RELEASE -->
-                                    <td class="release-details">
+                                    <td class="release-details" data-label="Record Assistance">
 
                                         <?php if ($applicant['status'] === "Approved") { ?>
 

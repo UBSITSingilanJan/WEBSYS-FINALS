@@ -303,8 +303,7 @@ $postedAidType = is_string($postedApplication['aid_type'] ?? null) ? trim($poste
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Resident Masterlist</title>
-    <link rel="stylesheet" href="worker_style.css">
+    <title>Manage Residents</title>
     <link rel="stylesheet" href="../theme.css">
     <link rel="stylesheet" href="../application/application_style.css">
     <style>
@@ -326,7 +325,7 @@ $postedAidType = is_string($postedApplication['aid_type'] ?? null) ? trim($poste
 
     <main class="main-content">
         <div class="topbar">
-            <h2>Resident Masterlist</h2>
+            <h2>Manage Residents</h2>
             <a class="search-clear" href="resident_management.php?action=add">Add New Resident</a>
         </div>
 

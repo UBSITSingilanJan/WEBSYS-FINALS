@@ -235,9 +235,6 @@ unset($_SESSION['flash']);
 
 <div class="dashboard">
 
-    <input type="checkbox" id="sidebar-toggle" class="sidebar-toggle">
-    <label for="sidebar-toggle" class="hamburger">☰</label>
-
     <?php $activePage = 'programs'; require __DIR__ . '/sidebar.php'; ?>
 
     <main class="main-content">

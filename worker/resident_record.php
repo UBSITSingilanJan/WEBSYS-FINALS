@@ -101,12 +101,9 @@ if (is_array($resident)) {
                             <thead>
                                 <tr>
                                     <th>Date</th>
-                                    <th>Program</th>
-                                    <th>Amount / Goods</th>
-                                    <th>Mode of Receipt</th>
-                                    <th>Released By</th>
-                                    <th>Received By</th>
-                                    <th>Acknowledged</th>
+                                    <th>Assistance Program</th>
+                                    <th>Amount Released</th>
+                                    <th>Remarks</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -114,11 +111,8 @@ if (is_array($resident)) {
                                 <tr>
                                     <td><?php echo htmlspecialchars((string)($fetch['release_date'] ?? 'N/A')); ?></td>
                                     <td><?php echo htmlspecialchars((string)($fetch['program'] ?? 'N/A')); ?></td>
-                                    <td><?php echo htmlspecialchars((string)($fetch['amount_or_goods'] ?? 'N/A')); ?></td>
-                                    <td><?php echo htmlspecialchars((string)($fetch['mode_of_receipt'] ?? 'N/A')); ?></td>
-                                    <td><?php echo htmlspecialchars((string)($fetch['released_by'] ?? 'N/A')); ?></td>
-                                    <td><?php echo htmlspecialchars((string)($fetch['received_by'] ?? 'N/A')); ?></td>
-                                    <td><?php echo !empty($fetch['acknowledged']) ? 'Yes' : 'No'; ?></td>
+                                    <td>₱<?php echo number_format((float)($fetch['amount'] ?? 0), 2); ?></td>
+                                    <td><?php echo htmlspecialchars((string)($fetch['remarks'] ?? '—')); ?></td>
                                 </tr>
                             <?php endforeach; ?>
                             </tbody>

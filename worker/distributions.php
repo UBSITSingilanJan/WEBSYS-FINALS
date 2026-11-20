@@ -1,46 +1,24 @@
 <?php
-require_once "../dbconn.php";
-require_once "../classes/beneficiary.php";
+session_start();
 
-$conn = new Beneficiary($pdo);
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $distribution_id = filter_input(INPUT_POST, 'distribution_id', FILTER_VALIDATE_INT);
-    $received_by = trim($_POST['received_by'] ?? '');
-    $ack = isset($_POST['acknowledged']) ? 1 : 0;
-    $released_by = $_SESSION['worker_name'] ?? '';
-
-    if ($distribution_id && $received_by !== '') {
-        $prep = $pdo->prepare(
-            "UPDATE aid_distribution
-             SET status = 'Released',
-                 released_by = :released_by,
-                 received_by = :received_by,
-                 release_date = COALESCE(release_date, CURDATE()),
-                 acknowledged = :ack
-             WHERE distribution_id = :id"
-        );
-        $prep->execute([
-            ':released_by' => $released_by,
-            ':received_by' => $received_by,
-            ':ack'         => $ack,
-            ':id'          => $distribution_id,
-        ]);
-    }
-
-    header('Location: distributions.php');
-    exit;
+if (
+    !isset($_SESSION['user_id']) ||
+    !isset($_SESSION['role']) ||
+    $_SESSION['role'] !== 'worker'
+) {
+    header("Location: ../index.php");
+    exit();
 }
 
-$prep = $pdo->prepare(
-    "SELECT d.*, r.firstname, r.middlename, r.lastname
-     FROM aid_distribution d
-     LEFT JOIN resident_information r ON r.resident_id = d.resident_id
-     WHERE d.status IS NULL OR d.status <> 'Released'
-     ORDER BY d.schedule_date ASC, d.distribution_id ASC"
-);
-$prep->execute();
-$pending = $prep->fetchAll(PDO::FETCH_ASSOC);
+require_once "../dbconn.php";
+require_once "../classes/application_manager.php";
+
+$manager = new ApplicationManager($pdo);
+$releases = $manager->fetch_all_releases();
+$totalReleased = $manager->total_released_amount();
+$escape = function ($value) {
+    return htmlspecialchars((string)($value ?? ''), ENT_QUOTES, 'UTF-8');
+};
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -65,58 +43,79 @@ $pending = $prep->fetchAll(PDO::FETCH_ASSOC);
     </aside>
 
     <main class="main-content">
-        <div class="topbar"><h2>Release Verification &amp; Acknowledgment</h2></div>
+        <div class="topbar">
+            <div>
+                <h2>Assistance Release History</h2>
+                <p class="release-note">Completed releases are recorded from approved applications in Manage Applications.</p>
+            </div>
+        </div>
 
-        <?php if (empty($pending)): ?>
-            <section class="panel"><p class="empty-message">No distributions awaiting release.</p></section>
-        <?php else: ?>
-            <section class="panel">
+        <div class="stats-container release-summary">
+            <section class="stat-card">
+                <p>Total Releases</p>
+                <h1><?php echo count($releases); ?></h1>
+            </section>
+            <section class="stat-card">
+                <p>Total Assistance Released</p>
+                <h1>₱<?php echo number_format((float)$totalReleased, 2); ?></h1>
+            </section>
+        </div>
+
+        <section class="panel">
+            <div class="panel-header">
+                <h3>Release Records</h3>
+            </div>
+
+            <?php if (!$releases): ?>
+                <p class="empty-message">No assistance releases have been recorded yet.</p>
+                <p class="empty-message">
+                    Once an application is approved, you can record its release from
+                    <a class="release-link" href="manage_applications.php">Manage Applications</a>.
+                </p>
+            <?php else: ?>
                 <div class="table-wrapper">
                     <table class="applicant-table">
                         <thead>
                             <tr>
+                                <th>Release ID</th>
                                 <th>Resident</th>
-                                <th>Program</th>
-                                <th>Schedule</th>
-                                <th>Amount / Goods</th>
-                                <th>Mode</th>
-                                <th>Received By</th>
-                                <th>Acknowledged</th>
+                                <th>Application</th>
+                                <th>Assistance Program</th>
+                                <th>Amount</th>
+                                <th>Release Date</th>
+                                <th>Remarks</th>
                             </tr>
                         </thead>
                         <tbody>
-                        <?php foreach ($pending as $fetch): ?>
+                        <?php foreach ($releases as $release): ?>
                             <tr>
-                                <td><?php echo htmlspecialchars(trim($fetch['firstname'] . ' ' . $fetch['middlename'] . ' ' . $fetch['lastname'])); ?></td>
-                                <td><?php echo htmlspecialchars($fetch['program']); ?></td>
-                                <td><?php echo htmlspecialchars($fetch['schedule_date']); ?></td>
-                                <td><?php echo htmlspecialchars($fetch['amount_or_goods']); ?></td>
-                                <td><?php echo htmlspecialchars($fetch['mode_of_receipt']); ?></td>
-
-                                <form method="post" style="display:contents">
-                                    <input type="hidden" name="distribution_id"
-                                           value="<?php echo (int)$fetch['distribution_id']; ?>">
-                                    <td>
-                                        <input type="text" name="received_by" class="search-input"
-                                               style="width:150px"
-                                               value="<?php echo htmlspecialchars($fetch['received_by']); ?>"
-                                               placeholder="Received by">
-                                    </td>
-                                    <td>
-                                        <input type="checkbox" name="acknowledged"
-                                            <?php echo $fetch['acknowledged'] ? 'checked' : ''; ?>>
-                                    </td>
-                                    <td>
-                                        <button type="submit" class="open-record-btn">Mark Released</button>
-                                    </td>
-                                </form>
+                                <td><?php echo $escape($release['release_id']); ?></td>
+                                <td>
+                                    <?php if (!empty($release['resident_id'])): ?>
+                                        <a class="release-link" href="resident_management.php?edit=<?php echo urlencode((string)$release['resident_id']); ?>">
+                                            <?php echo $escape($release['resident_name'] ?: 'Resident'); ?>
+                                        </a>
+                                        <small>Resident #<?php echo $escape($release['resident_id']); ?></small>
+                                    <?php else: ?>
+                                        <?php echo $escape($release['resident_name'] ?: 'Unlinked resident'); ?>
+                                    <?php endif; ?>
+                                </td>
+                                <td>
+                                    <a class="release-link" href="manage_applications.php?edit=<?php echo urlencode((string)$release['applicant_id']); ?>">
+                                        #<?php echo $escape($release['applicant_id']); ?>
+                                    </a>
+                                </td>
+                                <td><?php echo $escape($release['aid_type']); ?></td>
+                                <td class="amount-cell">₱<?php echo number_format((float)$release['amount'], 2); ?></td>
+                                <td><?php echo $escape(date('M j, Y', strtotime($release['release_date']))); ?></td>
+                                <td><?php echo $escape($release['remarks'] ?: '—'); ?></td>
                             </tr>
                         <?php endforeach; ?>
                         </tbody>
                     </table>
                 </div>
-            </section>
-        <?php endif; ?>
+            <?php endif; ?>
+        </section>
     </main>
 </div>
 </body>

@@ -24,12 +24,15 @@ $applications = $conn->fetch_resident_applications($_SESSION['user_id']);
 
     <title>Resident Dashboard</title>
 
-    <link rel="stylesheet" href="resident_style.css">
+    <link rel="stylesheet" href="../theme.css">
 </head>
 
 <body>
 
 <div class="dashboard">
+
+    <input type="checkbox" id="sidebar-toggle" class="sidebar-toggle">
+    <label for="sidebar-toggle" class="hamburger">☰</label>
 
     <aside class="sidebar">
 

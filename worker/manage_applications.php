@@ -200,7 +200,7 @@ unset($_SESSION['flash']);
     <title>Manage Applications</title>
 
     <!-- CSS Files -->
-    <link rel="stylesheet" href="worker_style.css">
+    <link rel="stylesheet" href="../theme.css">
     <link rel="stylesheet" href="manage_applications.css">
 
 </head>
@@ -209,7 +209,30 @@ unset($_SESSION['flash']);
 
 <div class="dashboard">
 
-    <?php $activePage = 'applications'; require __DIR__ . '/sidebar.php'; ?>
+    <input type="checkbox" id="sidebar-toggle" class="sidebar-toggle">
+    <label for="sidebar-toggle" class="hamburger">☰</label>
+    
+    <aside class="sidebar">
+
+        <h3>Financial Aid System</h3>
+
+        <a href="index.php">
+            Dashboard
+        </a>
+
+        <a href="manage_applications.php" class="active">
+            Manage Applications
+        </a>
+
+        <a href="manage_programs.php">
+            Manage Programs
+        </a>
+
+        <a href="logout.php">
+            Logout
+        </a>
+
+    </aside>
 
 
     <!-- MAIN CONTENT -->

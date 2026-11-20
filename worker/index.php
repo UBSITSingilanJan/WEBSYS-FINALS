@@ -38,7 +38,7 @@
 
     <title>Worker Dashboard</title>
 
-    <link rel="stylesheet" href="worker_style.css">
+    <link rel="stylesheet" href="../theme.css">
 
 </head>
 
@@ -46,7 +46,30 @@
 
 <div class="dashboard">
 
-    <?php $activePage = 'dashboard'; require __DIR__ . '/sidebar.php'; ?>
+   <input type="checkbox" id="sidebar-toggle" class="sidebar-toggle">
+    <label for="sidebar-toggle" class="hamburger">☰</label>
+    
+    <aside class="sidebar">
+
+        <h3>Financial Aid System</h3>
+
+        <a href="index.php" class="active">
+            Dashboard
+        </a>
+
+        <a href="manage_applications.php">
+            Manage Applications
+        </a>
+
+        <a href="manage_programs.php">
+            Manage Programs
+        </a>
+
+        <a href="logout.php">
+            Logout
+        </a>
+
+    </aside>
 
 
     <!-- Main Content -->

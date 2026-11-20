@@ -305,6 +305,7 @@ $postedAidType = is_string($postedApplication['aid_type'] ?? null) ? trim($poste
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Resident Masterlist</title>
     <link rel="stylesheet" href="worker_style.css">
+    <link rel="stylesheet" href="../theme.css">
     <link rel="stylesheet" href="../application/application_style.css">
     <style>
         .resident-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }

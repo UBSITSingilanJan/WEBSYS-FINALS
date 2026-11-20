@@ -42,11 +42,21 @@ if (is_array($resident)) {
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Resident Record</title>
-    <link rel="stylesheet" href="worker_style.css">
+    <link rel="stylesheet" href="../theme.css">
 </head>
 <body>
 <div class="dashboard">
-    <?php $activePage = 'residents'; require __DIR__ . '/sidebar.php'; ?>
+
+    <input type="checkbox" id="sidebar-toggle" class="sidebar-toggle">
+    <label for="sidebar-toggle" class="hamburger">☰</label>
+    
+    <aside class="sidebar">
+        <h3>Financial Aid System</h3>
+        <a href="index.php">Dashboard</a>
+        <a href="search.php">Search Residents</a>
+        <a href="distributions.php">Distributions</a>
+        <a href="logout.php">Logout</a>
+    </aside>
 
     <main class="main-content">
         <div class="topbar">

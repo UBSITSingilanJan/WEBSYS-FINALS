@@ -170,7 +170,7 @@ unset($_SESSION['flash']);
     <title>Manage Applications</title>
 
     <!-- CSS Files -->
-    <link rel="stylesheet" href="worker_style.css">
+    <link rel="stylesheet" href="../theme.css">
     <link rel="stylesheet" href="manage_applications.css">
 
 </head>
@@ -179,7 +179,9 @@ unset($_SESSION['flash']);
 
 <div class="dashboard">
 
-    <!-- SIDEBAR -->
+    <input type="checkbox" id="sidebar-toggle" class="sidebar-toggle">
+    <label for="sidebar-toggle" class="hamburger">☰</label>
+    
     <aside class="sidebar">
 
         <h3>Financial Aid System</h3>

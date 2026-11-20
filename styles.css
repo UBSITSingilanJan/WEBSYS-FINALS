@@ -1,13 +1,6 @@
 
 body.bg-light, 
 body {
-    background-image: linear-gradient(rgba(11, 61, 107, 0.7), rgba(11, 61, 107, 0.7)), url('background.png');
-    background-size: 120% auto; 
-    background-attachment: fixed;
-    background-repeat: no-repeat;
-  
-    animation: slideBackground 25s ease-in-out infinite alternate;
-    animation-delay: var(--scroll-time, 0s); 
 
 
     display: flex;
@@ -17,11 +10,6 @@ body {
     min-height: 100vh;
     margin: 0;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-@keyframes slideBackground {
-    0% { background-position: 0% center; }
-    100% { background-position: 100% center; }
 }
 
 .card.border-0 {
@@ -43,7 +31,6 @@ body {
     transform: translateX(-50%);
     width: 150px;
     height: 150px;
-    background-image: url('logo.jpg'); 
     background-size: cover;
     background-position: center;
     border-radius: 50%;
@@ -85,12 +72,12 @@ a.text-decoration-none:hover {
 }
 
 h1 {
-    color: #ffffff;
+    color: #072a4d;
     font-size: 26px;
     margin-bottom: 10px;
     margin-top: 50px;
     text-align: center;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  
 }
 
 body > form {

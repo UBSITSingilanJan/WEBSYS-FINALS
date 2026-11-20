@@ -27,7 +27,7 @@
 
 	<link rel="stylesheet" href="styles.css">
 </head>
-<body>
+<body >
 	<h1>Financial Aid System Registration</h1>
 	<form method="post">
 		<table>

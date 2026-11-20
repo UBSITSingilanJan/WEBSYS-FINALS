@@ -132,9 +132,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <title>Apply for Financial Aid</title>
+    <link rel="stylesheet" href="../theme.css">
 </head>
 
-<body>
+<body class="register-page">
 
     <h1>Financial Aid Application</h1>
     <?php if ($upload_error !== null): ?>

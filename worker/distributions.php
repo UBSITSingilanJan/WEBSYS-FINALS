@@ -48,10 +48,14 @@ $pending = $prep->fetchAll(PDO::FETCH_ASSOC);
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Distributions — Worker</title>
-    <link rel="stylesheet" href="worker_style.css">
+    <link rel="stylesheet" href="../theme.css">
 </head>
 <body>
 <div class="dashboard">
+
+    <input type="checkbox" id="sidebar-toggle" class="sidebar-toggle">
+    <label for="sidebar-toggle" class="hamburger">☰</label>
+    
     <aside class="sidebar">
         <h3>Financial Aid System</h3>
         <a href="index.php">Dashboard</a>

@@ -25,12 +25,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <title>Admin Dashboard</title>
-    <link rel="stylesheet" href="../worker/worker_style.css">
+    <link rel="stylesheet" href="../theme.css">
 </head>
 
 <body>
 
 <div class="dashboard">
+
+    <input type="checkbox" id="sidebar-toggle" class="sidebar-toggle">
+    <label for="sidebar-toggle" class="hamburger">☰</label>
 
     <aside class="sidebar">
 

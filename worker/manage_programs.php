@@ -226,7 +226,7 @@ unset($_SESSION['flash']);
 
     <title>Manage Programs</title>
 
-    <link rel="stylesheet" href="worker_style.css">
+    <link rel="stylesheet" href="../theme.css">
     <link rel="stylesheet" href="manage_programs.css">
 
 </head>
@@ -234,6 +234,9 @@ unset($_SESSION['flash']);
 <body>
 
 <div class="dashboard">
+
+    <input type="checkbox" id="sidebar-toggle" class="sidebar-toggle">
+    <label for="sidebar-toggle" class="hamburger">☰</label>
 
     <aside class="sidebar">
 

@@ -12,16 +12,23 @@ if (
 
 require_once "../dbconn.php";
 require_once "../classes/resident.php";
+require_once "../classes/applicant.php";
+require_once "../classes/program_manager.php";
+require_once "../classes/resident_profile.php";
 
 $residentManager = new Resident($pdo);
+$applicantManager = new Applicant($pdo);
+$programManager = new ProgramManager($pdo);
+$activePrograms = $programManager->fetch_active_programs();
 $escape = function ($value) {
-    return htmlspecialchars((string)($value ?? ''), ENT_QUOTES, 'UTF-8');
+    return htmlspecialchars(is_scalar($value ?? null) ? (string)$value : '', ENT_QUOTES, 'UTF-8');
 };
 $search = trim((string)($_GET['q'] ?? ''));
 $flash = $_SESSION['resident_flash'] ?? '';
 unset($_SESSION['resident_flash']);
 $error = '';
 $duplicates = [];
+$createApplication = ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['create_application'] ?? '') === '1');
 $residentId = filter_var($_GET['edit'] ?? null, FILTER_VALIDATE_INT);
 $isEditing = $residentId !== false && $residentId !== null && $residentId > 0;
 $resident = $isEditing ? $residentManager->find_resident($residentId) : null;
@@ -40,55 +47,243 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save'
         http_response_code(404);
         exit('Resident record not found.');
     }
-    foreach ([
-        'firstname', 'middlename', 'lastname', 'suffix', 'age', 'gender',
-        'contact', 'email', 'housenumber', 'street', 'barangay', 'city',
-        'province', 'zipcode'
-    ] as $field) {
-        $resident[$field] = trim((string)($_POST[$field] ?? ''));
-    }
-
-    $addressParts = array_filter([
-        $resident['housenumber'], $resident['street'], $resident['barangay'],
-        $resident['city'], $resident['province']
-    ], function ($part) {
-        return $part !== '';
-    });
-    $resident['address'] = implode(', ', $addressParts);
-
-    if ($resident['firstname'] === '' || $resident['lastname'] === '') {
-        $error = 'First name and last name are required.';
-    } elseif (
-        $resident['age'] !== '' &&
-        (!ctype_digit($resident['age']) || (int)$resident['age'] > 127)
-    ) {
-        $error = 'Enter a valid age between 0 and 127.';
-    } elseif (
-        $resident['gender'] !== '' &&
-        !in_array($resident['gender'], ['Male', 'Female', 'Other'], true)
-    ) {
-        $error = 'Select a valid gender.';
-    } elseif (
+    $profileResult = ResidentProfile::from_post($_POST);
+    $resident = $profileResult['data'] ? array_merge($_POST, $profileResult['data']) : $_POST;
+    $resident['email'] = is_string($_POST['email'] ?? null) ? trim($_POST['email']) : '';
+    $error = $profileResult['error'] ?? '';
+    if (
+        $error === '' &&
         $resident['email'] !== '' &&
-        !filter_var($resident['email'], FILTER_VALIDATE_EMAIL)
+        (strlen($resident['email']) > 100 || !filter_var($resident['email'], FILTER_VALIDATE_EMAIL))
     ) {
         $error = 'Enter a valid email address.';
     }
+
+    $addressParts = array_filter([
+        $resident['housenumber'] ?? '', $resident['street'] ?? '',
+        $resident['barangay'] ?? '', $resident['city'] ?? '',
+        $resident['province'] ?? ''
+    ], function ($part) {
+        return is_string($part) && $part !== '';
+    });
+    $resident['address'] = implode(', ', $addressParts);
 
     if ($error === '') {
         $duplicates = $residentManager->find_possible_duplicates($resident, $residentId);
         if ($duplicates) {
             $error = 'A resident with the same name and contact number or address already exists. Review the matching record before continuing.';
         } else {
-            if ($isEditing) {
-                $residentManager->update_resident($residentId, $resident);
-                $_SESSION['resident_flash'] = 'Resident information updated.';
-            } else {
-                $residentId = $residentManager->create_resident($resident);
-                $_SESSION['resident_flash'] = 'Resident added to the masterlist.';
+            $applicationData = [];
+            $uploadedDocuments = [];
+
+            if ($createApplication && $isEditing) {
+                $error = 'An application can only be created while adding a new resident.';
+            } elseif ($createApplication) {
+                $postedApplication = $_POST['application'] ?? [];
+                if (!is_array($postedApplication)) {
+                    $postedApplication = [];
+                    $error = 'Enter valid application details.';
+                }
+
+                $aidType = $postedApplication['aid_type'] ?? '';
+                $applicationData = [
+                    'gender' => $resident['gender'],
+                    'civilstatus' => $resident['civilstatus'],
+                    'education' => $resident['education'],
+                    'soloparent' => $resident['soloparent'],
+                    'children' => $resident['children'],
+                    'member' => $resident['member'],
+                    'program' => $resident['program'],
+                    'dependent' => $resident['dependent'],
+                    'relationship' => $resident['relationship'],
+                    'birthplace' => $resident['birthplace'],
+                    'occupation' => $resident['occupation'],
+                    'school' => $resident['school'],
+                    'yearlevel' => $resident['yearlevel'],
+                    'course' => $resident['course'],
+                    'benefits' => $resident['benefits'],
+                    'enrolled' => $resident['enrolled'],
+                    'attained' => $resident['attained'],
+                    'senior' => $resident['senior'],
+                    'issues' => $resident['issues'],
+                    'aid_type' => is_string($aidType) ? trim($aidType) : '',
+                ];
+
+                if (
+                    $error === '' &&
+                    !in_array($applicationData['gender'], ['Male', 'Female', 'Other'], true)
+                ) {
+                    $error = 'Select a valid gender for the application.';
+                } elseif (
+                    $error === '' &&
+                    !in_array($applicationData['civilstatus'], ['Single', 'Married', 'Widowed', 'Annulled'], true)
+                ) {
+                    $error = 'Select a civil status for the application.';
+                } elseif (
+                    $error === '' &&
+                    !in_array($applicationData['education'], ['Elementary', 'High School', 'Senior High School', 'College', 'Graduate', 'Vocational'], true)
+                ) {
+                    $error = 'Select the highest educational attainment for the application.';
+                } elseif (
+                    $error === '' &&
+                    $applicationData['birthplace'] === ''
+                ) {
+                    $error = 'Enter the applicant\'s place of birth.';
+                } elseif (
+                    $error === '' &&
+                    $applicationData['occupation'] === ''
+                ) {
+                    $error = 'Enter the applicant’s occupation.';
+                } elseif (
+                    $error === '' &&
+                    !$programManager->is_active_program($applicationData['aid_type'])
+                ) {
+                    $error = 'Select an active assistance program.';
+                }
+
+                if ($error === '' && strlen($applicationData['aid_type']) > 150) {
+                    $error = 'Select a valid assistance program.';
+                }
+
+                if ($error === '') {
+                    $documentUpload = $_FILES['application_documents'] ?? null;
+                    if (
+                        !is_array($documentUpload) ||
+                        !isset($documentUpload['error'], $documentUpload['name'], $documentUpload['tmp_name'], $documentUpload['size']) ||
+                        !is_array($documentUpload['error']) ||
+                        !is_array($documentUpload['name']) ||
+                        !is_array($documentUpload['tmp_name']) ||
+                        !is_array($documentUpload['size']) ||
+                        count($documentUpload['error']) === 0
+                    ) {
+                        $error = 'Upload at least one supporting document for the application.';
+                    } else {
+                        $allowedTypes = [
+                            'image/jpeg' => 'jpg',
+                            'image/png' => 'png',
+                            'image/webp' => 'webp',
+                            'application/pdf' => 'pdf',
+                        ];
+                        $fileInfo = new finfo(FILEINFO_MIME_TYPE);
+
+                        foreach ($documentUpload['error'] as $key => $uploadError) {
+                            if (
+                                $uploadError !== UPLOAD_ERR_OK ||
+                                !isset($documentUpload['tmp_name'][$key], $documentUpload['size'][$key], $documentUpload['name'][$key])
+                            ) {
+                                $error = 'A supporting document could not be uploaded.';
+                                break;
+                            }
+
+                            $temporaryName = $documentUpload['tmp_name'][$key];
+                            $fileSize = $documentUpload['size'][$key];
+                            if (
+                                !is_string($temporaryName) ||
+                                !is_uploaded_file($temporaryName) ||
+                                !is_numeric($fileSize) ||
+                                (int)$fileSize <= 0 ||
+                                (int)$fileSize > 5 * 1024 * 1024
+                            ) {
+                                $error = 'Each supporting document must be a valid file no larger than 5 MB.';
+                                break;
+                            }
+
+                            $mimeType = $fileInfo->file($temporaryName);
+                            if (!isset($allowedTypes[$mimeType])) {
+                                $error = 'Supporting documents must be JPEG, PNG, WebP, or PDF files.';
+                                break;
+                            }
+
+                            $fileData = file_get_contents($temporaryName);
+                            if ($fileData === false) {
+                                $error = 'A supporting document could not be read.';
+                                break;
+                            }
+
+                            $originalName = $documentUpload['name'][$key];
+                            if (!is_string($originalName)) {
+                                $error = 'A supporting document has an invalid filename.';
+                                break;
+                            }
+                            $originalName = basename(str_replace('\\', '/', $originalName));
+                            $originalName = preg_replace('/[\x00-\x1F\x7F]/', '', $originalName);
+                            $originalName = substr(trim($originalName), 0, 255);
+                            if ($originalName === '') {
+                                $originalName = 'document.' . $allowedTypes[$mimeType];
+                            }
+
+                            $uploadedDocuments[] = [
+                                'original_name' => $originalName,
+                                'mime_type' => $mimeType,
+                                'file_data' => $fileData,
+                            ];
+                        }
+                    }
+                }
             }
-            header('Location: resident_management.php?edit=' . urlencode((string)$residentId));
-            exit();
+
+            if ($error === '') {
+                try {
+                    $pdo->beginTransaction();
+                    if ($isEditing) {
+                        $residentManager->update_resident($residentId, $resident);
+                        $_SESSION['resident_flash'] = 'Resident information updated.';
+                    } else {
+                        $residentId = $residentManager->create_resident($resident);
+                        $_SESSION['resident_flash'] = 'Resident added to the masterlist.';
+
+                        if ($createApplication) {
+                            $applicantManager->insert_data(
+                                $resident['firstname'],
+                                $resident['middlename'],
+                                $resident['lastname'],
+                                $resident['suffix'],
+                                $resident['contact'],
+                                $resident['email'] !== '' ? $resident['email'] : null,
+                                $applicationData['gender'],
+                                $applicationData['civilstatus'],
+                                $applicationData['education'],
+                                $applicationData['soloparent'] !== '' ? $applicationData['soloparent'] : null,
+                                $applicationData['children'] !== '' ? $applicationData['children'] : null,
+                                $applicationData['member'] !== '' ? $applicationData['member'] : null,
+                                $applicationData['program'] !== '' ? $applicationData['program'] : null,
+                                $applicationData['dependent'] !== '' ? $applicationData['dependent'] : null,
+                                $applicationData['relationship'] !== '' ? $applicationData['relationship'] : null,
+                                $resident['housenumber'],
+                                $resident['street'],
+                                $resident['barangay'],
+                                $resident['city'],
+                                $resident['province'],
+                                $resident['zipcode'],
+                                $applicationData['birthplace'],
+                                $applicationData['occupation'],
+                                $applicationData['school'] !== '' ? $applicationData['school'] : null,
+                                $applicationData['yearlevel'] !== '' ? $applicationData['yearlevel'] : null,
+                                $applicationData['course'] !== '' ? $applicationData['course'] : null,
+                                $applicationData['benefits'],
+                                $applicationData['enrolled'] !== '' ? $applicationData['enrolled'] : null,
+                                $applicationData['attained'] !== '' ? $applicationData['attained'] : null,
+                                $applicationData['senior'],
+                                $applicationData['issues'] !== '' ? $applicationData['issues'] : null,
+                                $applicationData['aid_type'],
+                                $residentId,
+                                null,
+                                $uploadedDocuments
+                            );
+                            $_SESSION['resident_flash'] = 'Resident and pending application added successfully.';
+                        }
+                    }
+                    $pdo->commit();
+                    header('Location: resident_management.php?edit=' . urlencode((string)$residentId));
+                    exit();
+                } catch (PDOException $exception) {
+                    if ($pdo->inTransaction()) {
+                        $pdo->rollBack();
+                    }
+                    error_log('Unable to save worker-created resident/application: ' . $exception->getMessage());
+                    $error = 'The resident and application could not be saved. No changes were kept; please review the details and try again.';
+                }
+            }
         }
     }
 }
@@ -96,6 +291,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save'
 $residents = $residentManager->search_residents($search);
 $formOpen = $isEditing || (($_GET['action'] ?? '') === 'add') || ($_SERVER['REQUEST_METHOD'] === 'POST');
 $displayResident = is_array($resident) ? $resident : [];
+$profileValues = $displayResident;
+$postedApplication = $_POST['application'] ?? [];
+if (!is_array($postedApplication)) {
+    $postedApplication = [];
+}
+$postedAidType = is_string($postedApplication['aid_type'] ?? null) ? trim($postedApplication['aid_type']) : '';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -104,11 +305,12 @@ $displayResident = is_array($resident) ? $resident : [];
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Resident Masterlist</title>
     <link rel="stylesheet" href="worker_style.css">
+    <link rel="stylesheet" href="../application/application_style.css">
     <style>
         .resident-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
-        .resident-form label { display: flex; flex-direction: column; gap: 6px; color: #555; font-size: 13px; }
-        .resident-form input, .resident-form select, .search-input { width: 100%; padding: 10px; border: 1px solid #bbb; border-radius: 5px; font: inherit; }
-        .resident-form .full-width { grid-column: 1 / -1; }
+        .resident-form > label { display: flex; flex-direction: column; gap: 6px; color: #555; font-size: 13px; }
+        .resident-form > label input, .resident-form > label select, .search-input { width: 100%; padding: 10px; border: 1px solid #bbb; border-radius: 5px; font: inherit; }
+        .resident-form .full-width, .resident-form > .application-form-section { grid-column: 1 / -1; }
         .resident-actions { display: flex; gap: 10px; align-items: center; }
         .resident-actions button, .resident-actions a, .resident-link { display: inline-block; padding: 9px 13px; border: 0; border-radius: 5px; background: #2563eb; color: white; text-decoration: none; cursor: pointer; font: inherit; }
         .resident-actions a { background: #666; }
@@ -183,30 +385,75 @@ $displayResident = is_array($resident) ? $resident : [];
                         <?php endforeach; ?>
                     </ul>
                 <?php endif; ?>
-                <form method="post" class="resident-form">
+                <form method="post" enctype="multipart/form-data" class="resident-form">
                     <input type="hidden" name="action" value="save">
                     <input type="hidden" name="resident_id" value="<?php echo $escape($residentId); ?>">
-                    <label>First name *<input name="firstname" maxlength="100" required value="<?php echo $escape($displayResident['firstname'] ?? ''); ?>"></label>
-                    <label>Middle name<input name="middlename" maxlength="100" value="<?php echo $escape($displayResident['middlename'] ?? ''); ?>"></label>
-                    <label>Last name *<input name="lastname" maxlength="100" required value="<?php echo $escape($displayResident['lastname'] ?? ''); ?>"></label>
-                    <label>Suffix<input name="suffix" maxlength="20" value="<?php echo $escape($displayResident['suffix'] ?? ''); ?>"></label>
-                    <label>Age<input type="number" name="age" min="0" max="127" value="<?php echo $escape($displayResident['age'] ?? ''); ?>"></label>
-                    <label>Gender
-                        <select name="gender">
-                            <option value="">Select</option>
-                            <?php foreach (['Male', 'Female', 'Other'] as $gender): ?>
-                                <option value="<?php echo $escape($gender); ?>" <?php echo ($displayResident['gender'] ?? '') === $gender ? 'selected' : ''; ?>><?php echo $escape($gender); ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </label>
-                    <label>Contact number<input name="contact" maxlength="11" value="<?php echo $escape($displayResident['contact'] ?? ''); ?>"></label>
-                    <label>Email<input type="email" name="email" maxlength="100" value="<?php echo $escape($displayResident['email'] ?? ''); ?>"></label>
-                    <label>House number<input name="housenumber" maxlength="50" value="<?php echo $escape($displayResident['housenumber'] ?? ''); ?>"></label>
-                    <label>Street<input name="street" maxlength="100" value="<?php echo $escape($displayResident['street'] ?? ''); ?>"></label>
-                    <label>Barangay<input name="barangay" maxlength="100" value="<?php echo $escape($displayResident['barangay'] ?? ''); ?>"></label>
-                    <label>City / Municipality<input name="city" maxlength="100" value="<?php echo $escape($displayResident['city'] ?? ''); ?>"></label>
-                    <label>Province<input name="province" maxlength="100" value="<?php echo $escape($displayResident['province'] ?? ''); ?>"></label>
-                    <label>ZIP code<input name="zipcode" maxlength="20" value="<?php echo $escape($displayResident['zipcode'] ?? ''); ?>"></label>
+                    <?php require "../application/resident_profile_fields.php"; ?>
+
+                    <section class="application-form-section full-width" aria-labelledby="resident-contact-heading">
+                        <h4 id="resident-contact-heading">Resident Contact</h4>
+                        <div class="application-fields-grid">
+                            <label>Email address
+                                <input class="form-control" type="email" name="email" maxlength="100" value="<?php echo $escape($displayResident['email'] ?? ''); ?>">
+                            </label>
+                        </div>
+                    </section>
+
+                    <?php if (!$isEditing): ?>
+                        <div class="application-create full-width">
+                            <div class="application-heading">
+                                <h3>Financial assistance application</h3>
+                                <p>Optional. Save the resident only, or create a pending application at the same time.</p>
+                            </div>
+                            <label class="application-create-toggle">
+                                <input
+                                    type="checkbox"
+                                    id="create-application"
+                                    name="create_application"
+                                    value="1"
+                                    <?php echo $createApplication ? 'checked' : ''; ?>
+                                    aria-controls="application-fields"
+                                >
+                                <span>Create an application for this resident now</span>
+                            </label>
+
+                            <div class="application-fields" id="application-fields">
+                                <section class="application-form-section">
+                                    <h4>Application details</h4>
+                                    <p class="application-help">The complete profile above will be used for the pending application. Choose the assistance program and attach its supporting documents.</p>
+                                    <div class="application-fields-grid">
+                                        <label class="application-full">Assistance program *
+                                            <select class="form-control" name="application[aid_type]" data-application-required <?php echo empty($activePrograms) ? 'disabled' : ''; ?>>
+                                                <option value="">Select assistance program</option>
+                                                <?php foreach ($activePrograms as $activeProgram): ?>
+                                                    <option value="<?php echo $escape($activeProgram['program_name']); ?>" <?php echo $postedAidType === $activeProgram['program_name'] ? 'selected' : ''; ?>>
+                                                        <?php echo $escape($activeProgram['program_name']); ?>
+                                                    </option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </label>
+                                        <?php if (empty($activePrograms)): ?>
+                                            <p class="application-help application-full">There are no active assistance programs. You can still save the resident without an application.</p>
+                                        <?php endif; ?>
+                                    </div>
+                                </section>
+
+                                <section class="application-form-section">
+                                    <h4>Supporting documents *</h4>
+                                    <p class="application-help">Upload JPEG, PNG, WebP, or PDF files, up to 5 MB each. At least one is required for an application.</p>
+                                    <input
+                                        class="application-file"
+                                        type="file"
+                                        name="application_documents[]"
+                                        multiple
+                                        accept=".jpg,.jpeg,.png,.webp,.pdf"
+                                        data-application-required
+                                    >
+                                </section>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+
                     <div class="resident-actions full-width">
                         <button type="submit">Save Resident</button>
                         <a href="resident_management.php">Cancel</a>
@@ -216,5 +463,21 @@ $displayResident = is_array($resident) ? $resident : [];
         <?php endif; ?>
     </main>
 </div>
+<script>
+    const applicationToggle = document.getElementById('create-application');
+    const applicationFields = document.getElementById('application-fields');
+
+    if (applicationToggle && applicationFields) {
+        const syncApplicationFields = () => {
+            applicationFields.hidden = !applicationToggle.checked;
+            applicationToggle.setAttribute('aria-expanded', applicationToggle.checked ? 'true' : 'false');
+            document.querySelectorAll('[data-application-required]').forEach((field) => {
+                field.required = applicationToggle.checked;
+            });
+        };
+        applicationToggle.addEventListener('change', syncApplicationFields);
+        syncApplicationFields();
+    }
+</script>
 </body>
 </html>

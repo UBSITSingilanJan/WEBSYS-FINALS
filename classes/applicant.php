@@ -13,7 +13,10 @@
         }
 
         public function insert_data($firstname, $middlename, $lastname, $suffix, $contact, $email, $gender, $civilstatus, $education, $soloparent, $children, $member, $program, $dependent, $relationship, $housenumber, $street, $barangay, $city, $province, $zipcode, $birthplace, $occupation, $school, $yearlevel, $course, $benefits, $enrolled, $attained, $senior, $issues, $aid_type, $resident_id, $user_id, $documents){
-            $this->pdo->beginTransaction();
+            $ownsTransaction = !$this->pdo->inTransaction();
+            if ($ownsTransaction) {
+                $this->pdo->beginTransaction();
+            }
 
             try {
                 $insert = "INSERT INTO application(
@@ -87,10 +90,12 @@
                     $documentInsert->execute();
                 }
 
-                $this->pdo->commit();
+                if ($ownsTransaction) {
+                    $this->pdo->commit();
+                }
                 return $applicantId;
             } catch (PDOException $exception) {
-                if ($this->pdo->inTransaction()) {
+                if ($ownsTransaction && $this->pdo->inTransaction()) {
                     $this->pdo->rollBack();
                 }
                 throw $exception;
@@ -146,21 +151,8 @@
 
         public function fetch_profile_data($user_id){
             $fetch = "SELECT
-                        ri.resident_id,
-                        ri.firstname,
-                        ri.middlename,
-                        ri.lastname,
-                        ri.suffix,
-                        ri.contact,
-                        ri.gender,
-                        u.email,
-                        ri.housenumber,
-                        ri.street,
-                        ri.barangay,
-                        ri.city,
-                        ri.province,
-                        ri.zipcode
-
+                        ri.*,
+                        u.email AS account_email
                       FROM resident_information ri
                       INNER JOIN user u ON ri.user_id = u.user_id
                       WHERE ri.user_id = ?";

@@ -247,7 +247,10 @@ class ApplicationManager {
                         AND (
                             (a.user_id IS NOT NULL AND previous_application.user_id = a.user_id)
                             OR (a.resident_id IS NOT NULL AND previous_application.resident_id = a.resident_id)
-                            OR previous_application.email = a.email
+                            OR (
+                                a.email IS NOT NULL AND a.email <> ''
+                                AND previous_application.email = a.email
+                            )
                         )
                     ) AS previous_request_count,
 
@@ -262,7 +265,10 @@ class ApplicationManager {
                         AND (
                             (a.user_id IS NOT NULL AND previous_application.user_id = a.user_id)
                             OR (a.resident_id IS NOT NULL AND previous_application.resident_id = a.resident_id)
-                            OR previous_application.email = a.email
+                            OR (
+                                a.email IS NOT NULL AND a.email <> ''
+                                AND previous_application.email = a.email
+                            )
                         )
                     ) AS previous_requests,
 
@@ -274,7 +280,10 @@ class ApplicationManager {
                         AND (
                             (a.user_id IS NOT NULL AND previous_application.user_id = a.user_id)
                             OR (a.resident_id IS NOT NULL AND previous_application.resident_id = a.resident_id)
-                            OR previous_application.email = a.email
+                            OR (
+                                a.email IS NOT NULL AND a.email <> ''
+                                AND previous_application.email = a.email
+                            )
                         )
                     ) AS other_active_aid_count,
 

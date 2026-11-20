@@ -21,10 +21,32 @@
                 || hash_equals($storedPassword, $password);
         }
 
-        public function insert_data($firstname, $lastname, $email, $password){
+        public function insert_data(array $resident, $email, $password){
             $email = trim($email);
-            $firstname = trim($firstname);
-            $lastname = trim($lastname);
+            $firstname = trim($resident['firstname']);
+            $lastname = trim($resident['lastname']);
+            $address = implode(', ', array_filter([
+                $resident['housenumber'], $resident['street'], $resident['barangay'],
+                $resident['city'], $resident['province']
+            ], function ($part) {
+                return trim((string)$part) !== '';
+            }));
+            $fields = [
+                'firstname', 'middlename', 'lastname', 'suffix', 'nickname',
+                'birthdate', 'age', 'gender', 'civilstatus', 'contact', 'email',
+                'housenumber', 'street', 'barangay', 'city', 'province', 'zipcode',
+                'address', 'birthplace', 'occupation', 'monthly_income', 'education',
+                'course', 'talents', 'marketable_skills', 'health_condition',
+                'transport_mode', 'transport_details', 'soloparent', 'children',
+                'member', 'program', 'dependent', 'relationship', 'benefits',
+                'school', 'yearlevel', 'enrolled', 'attained', 'senior', 'issues'
+            ];
+            $resident['email'] = $email;
+            $resident['address'] = $address;
+            $columns = implode(', ', array_map(function ($field) {
+                return '`' . $field . '`';
+            }, array_merge(['user_id'], $fields)));
+            $placeholders = implode(', ', array_fill(0, count($fields) + 1, '?'));
 
             try {
                 $this -> pdo -> beginTransaction();
@@ -40,15 +62,19 @@
                     ":firstname" => $firstname,
                     ":lastname" => $lastname,
                     ":email" => $email,
-                    ":password" => $password,
+                    ":password" => password_hash($password, PASSWORD_DEFAULT),
                 ]);
 
                 $user_id = $this -> pdo -> lastInsertId();
 
-                $insert_resident = "INSERT INTO resident_information (user_id, firstname, lastname) VALUES (?, ?, ?)";
-
+                $insert_resident = "INSERT INTO resident_information ($columns) VALUES ($placeholders)";
                 $prep_resident = $this -> pdo -> prepare($insert_resident);
-                $prep_resident -> execute([$user_id, $firstname, $lastname]);
+                $values = [(int)$user_id];
+                foreach ($fields as $field) {
+                    $value = $resident[$field] ?? '';
+                    $values[] = trim((string)$value) !== '' ? $value : null;
+                }
+                $prep_resident->execute($values);
 
                 $this -> pdo -> commit();
 

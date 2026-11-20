@@ -45,47 +45,92 @@
 		}
 
 		public function create_resident(array $resident){
-			$insert = "INSERT INTO resident_information (
-				firstname, middlename, lastname, suffix, age, gender, contact, email,
-				housenumber, street, barangay, city, province, zipcode, address
-			) VALUES (
-				:firstname, :middlename, :lastname, :suffix, :age, :gender, :contact, :email,
-				:housenumber, :street, :barangay, :city, :province, :zipcode, :address
-			)";
+			$fields = $this->profile_fields();
+			$columns = implode(', ', array_map(function ($field) {
+				return '`' . $field . '`';
+			}, $fields));
+			$placeholders = implode(', ', array_map(function ($field) {
+				return ':' . $field;
+			}, $fields));
+			$insert = "INSERT INTO resident_information ($columns) VALUES ($placeholders)";
 			$prep = $this->pdo->prepare($insert);
 			$prep->execute($this->resident_parameters($resident));
 			return (int)$this->pdo->lastInsertId();
 		}
 
 		public function update_resident($resident_id, array $resident){
-			$this->update_data(
-				$resident_id,
-				$resident['firstname'],
-				$resident['middlename'],
-				$resident['lastname'],
-				$resident['suffix'],
-				$resident['age'],
-				$resident['gender'],
-				$resident['contact'],
-				$resident['email'],
-				$resident['housenumber'],
-				$resident['street'],
-				$resident['barangay'],
-				$resident['city'],
-				$resident['province'],
-				$resident['zipcode']
+			$fields = $this->profile_fields();
+			$assignments = array_map(function ($field) {
+				return '`' . $field . '` = :' . $field;
+			}, $fields);
+			$params = $this->resident_parameters($resident);
+			$params[':resident_id'] = $resident_id;
+			$update = $this->pdo->prepare(
+				'UPDATE resident_information SET ' . implode(', ', $assignments) . ' WHERE resident_id = :resident_id'
 			);
+			$update->execute($params);
+		}
+
+		public function update_profile($user_id, array $resident){
+			$address = implode(', ', array_filter([
+				$resident['housenumber'], $resident['street'], $resident['barangay'],
+				$resident['city'], $resident['province']
+			], function ($part) {
+				return trim((string)$part) !== '';
+			}));
+			$fields = [
+				'firstname', 'middlename', 'lastname', 'suffix', 'nickname',
+				'birthdate', 'age', 'gender', 'civilstatus', 'contact', 'email',
+				'housenumber', 'street', 'barangay', 'city', 'province', 'zipcode',
+				'address', 'birthplace', 'occupation', 'monthly_income', 'education',
+				'course', 'talents', 'marketable_skills', 'health_condition',
+				'transport_mode', 'transport_details', 'soloparent', 'children',
+				'member', 'program', 'dependent', 'relationship', 'benefits',
+				'school', 'yearlevel', 'enrolled', 'attained', 'senior', 'issues'
+			];
+			$assignments = array_map(function ($field) {
+				return $field . ' = :' . $field;
+			}, $fields);
+			$params = [];
+			foreach ($fields as $field) {
+				$value = $field === 'address' ? $address : ($resident[$field] ?? '');
+				$params[':' . $field] = trim((string)$value) !== '' ? $value : null;
+			}
+			$params[':user_id'] = $user_id;
+
+			$updateResident = $this->pdo->prepare(
+				'UPDATE resident_information SET ' . implode(', ', $assignments) . ' WHERE user_id = :user_id'
+			);
+			$updateResident->execute($params);
+
+			$updateUser = $this->pdo->prepare(
+				'UPDATE user SET firstname = :firstname, lastname = :lastname WHERE user_id = :user_id'
+			);
+			$updateUser->execute([
+				':firstname' => $resident['firstname'],
+				':lastname' => $resident['lastname'],
+				':user_id' => $user_id,
+			]);
+		}
+
+		private function profile_fields(){
+			return [
+				'firstname', 'middlename', 'lastname', 'suffix', 'nickname',
+				'birthdate', 'age', 'gender', 'civilstatus', 'contact', 'email',
+				'housenumber', 'street', 'barangay', 'city', 'province', 'zipcode',
+				'address', 'birthplace', 'occupation', 'monthly_income', 'education',
+				'course', 'talents', 'marketable_skills', 'health_condition',
+				'transport_mode', 'transport_details', 'soloparent', 'children',
+				'member', 'program', 'dependent', 'relationship', 'benefits',
+				'school', 'yearlevel', 'enrolled', 'attained', 'senior', 'issues'
+			];
 		}
 
 		private function resident_parameters(array $resident){
 			$parameters = [];
-			foreach ([
-				'firstname', 'middlename', 'lastname', 'suffix', 'age', 'gender',
-				'contact', 'email', 'housenumber', 'street', 'barangay', 'city',
-				'province', 'zipcode', 'address'
-			] as $field) {
-				$value = $resident[$field];
-				$parameters[':' . $field] = $value === '' ? null : $value;
+			foreach ($this->profile_fields() as $field) {
+				$value = $resident[$field] ?? '';
+				$parameters[':' . $field] = trim((string)$value) !== '' ? $value : null;
 			}
 			return $parameters;
 		}

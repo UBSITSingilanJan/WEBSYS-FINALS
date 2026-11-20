@@ -216,11 +216,11 @@ unset($_SESSION['flash']);
 
         <h3>Financial Aid System</h3>
 
-        <a href="index.php" class="active">
+        <a href="index.php">
             Dashboard
         </a>
 
-        <a href="manage_applications.php">
+        <a href="manage_applications.php" class="active">
             Manage Applications
         </a>
 

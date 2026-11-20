@@ -103,7 +103,7 @@ $displayResident = is_array($resident) ? $resident : [];
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Resident Masterlist</title>
-    <link rel="stylesheet" href="worker_style.css">
+    <link rel="stylesheet" href="../theme.css">
     <style>
         .resident-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
         .resident-form label { display: flex; flex-direction: column; gap: 6px; color: #555; font-size: 13px; }

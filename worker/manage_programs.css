@@ -1,7 +1,10 @@
+/* ============================================================
+   manage_programs.css  -  Manage Programs page only.
+   Connected to the shared theme (../theme.css).
+   ============================================================ */
+@import url("../theme.css");
 
-.programs-panel {
-    padding: 20px;
-}
+.programs-panel { padding: 22px 24px; }
 
 .programs-header {
     display: flex;
@@ -10,294 +13,114 @@
     gap: 15px;
     margin-bottom: 20px;
 }
-
-.programs-header h3 {
-    margin: 0;
-}
-
-.add-program-btn,
-.save-program-btn {
-    background: #3d3d42;
-    color: white;
-    border: 1px solid #3d3d42;
-    border-radius: 6px;
-    padding: 11px 16px;
-    cursor: pointer;
-    font-size: 13px;
-    font-weight: bold;
-    transition: 0.2s;
-}
-
-.add-program-btn:hover,
-.save-program-btn:hover {
-    background: #222;
-}
+.programs-header h3 { margin: 0; }
 
 .program-form {
     display: none;
-    background: #f8f9fa;
-    border: 1px solid #ddd;
-    border-radius: 8px;
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
     padding: 20px;
     margin-bottom: 20px;
 }
-
-.program-form.show {
-    display: block;
-}
-
-.program-form h3 {
-    margin-bottom: 18px;
-}
-
-.program-form .form-group {
-    margin-bottom: 14px;
-}
-
-.program-form label {
-    display: block;
-    font-size: 13px;
-    font-weight: bold;
-    margin-bottom: 7px;
-}
-
-.program-form input,
-.program-form textarea {
+.program-form.show { display: block; }
+.program-form h3 { margin-bottom: 18px; }
+.program-form .form-group { margin-bottom: 14px; }
+.program-form label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 7px; color: var(--muted); }
+.program-form input, .program-form textarea {
     width: 100%;
-    padding: 12px;
-    border: 1px solid #cfd3dc;
-    border-radius: 6px;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 14px;
-    background: white;
-}
-
-.program-form input:focus,
-.program-form textarea:focus {
-    outline: none;
-    border-color: #555;
-}
-
-.program-form textarea,
-.edit-form textarea {
-    resize: vertical;
-}
-
-.program-search {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-bottom: 20px;
-}
-
-.program-search .search-input {
-    width: min(100%, 520px);
-    padding: 13px;
-    border: 1px solid #cfd3dc;
-    border-radius: 8px;
+    padding: 11px 12px;
+    border: 1px solid var(--input-border);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
     font-size: 14px;
 }
-
-.program-search .search-input:focus {
+.program-form input:focus, .program-form textarea:focus,
+.edit-form input:focus, .edit-form textarea:focus {
     outline: none;
-    border-color: #555;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-ring);
 }
+.program-form textarea, .edit-form textarea { resize: vertical; }
 
-.program-search .search-btn {
-    background: #3d3d42;
-    color: white;
-    border: 0;
-    border-radius: 8px;
-    padding: 12px 20px;
-    cursor: pointer;
-    font-size: 13px;
-}
+.program-search .search-input { width: min(100%, 520px); }
 
-.program-search .search-btn:hover {
-    background: #222;
-}
-
-.program-search .search-clear {
-    display: inline-flex;
-    align-items: center;
-    color: #444;
-    text-decoration: none;
-    padding: 10px;
-}
-
-.table-wrapper {
-    width: 100%;
-    overflow-x: auto;
-}
-
-.program-table {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 700px;
-}
-
-.program-table th,
-.program-table td {
-    padding: 15px 12px;
+.program-table { width: 100%; border-collapse: collapse; min-width: 700px; }
+.program-table th, .program-table td {
+    padding: 14px 12px;
     text-align: left;
-    border-bottom: 1px solid #ddd;
-    vertical-align: middle;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
     font-size: 14px;
 }
+.program-table th { color: var(--muted); font-weight: 700; font-size: 12.5px; text-transform: uppercase; background: var(--surface-alt); }
+.program-table tbody tr:hover { background: var(--surface-alt); }
 
-.program-table th {
-    color: #444;
-    font-weight: bold;
-    background: #fafafa;
-}
+.program-description { color: var(--muted); max-width: 350px; line-height: 1.5; overflow-wrap: anywhere; }
 
-.program-table tbody tr:hover {
-    background: #fafafa;
-}
+.program-actions { min-width: 190px; white-space: nowrap; }
+.edit-program { display: inline-block; vertical-align: top; }
+.status-form { display: inline-block; vertical-align: top; margin-left: 5px; }
 
-.program-description {
-    color: #777;
-    max-width: 350px;
-    line-height: 1.5;
-    overflow-wrap: anywhere;
-}
-
-.program-status {
-    display: inline-block;
-    padding: 6px 11px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: bold;
-}
-
-.status-active {
-    background: #d1e7dd;
-    color: #0f5132;
-}
-
-.status-inactive {
-    background: #e2e3e5;
-    color: #41464b;
-}
-
-.program-actions {
-    min-width: 190px;
-    white-space: nowrap;
-}
-
-.edit-program {
-    display: inline-block;
-    vertical-align: middle;
-}
-
-.edit-btn,
-.deactivate-btn,
-.activate-btn {
+.edit-btn, .deactivate-btn, .activate-btn {
     display: inline-block;
     border: 0;
-    border-radius: 6px;
+    border-radius: var(--radius-sm);
     padding: 9px 12px;
     font-size: 12px;
-    font-weight: bold;
+    font-weight: 700;
     cursor: pointer;
 }
+.edit-btn { background: var(--primary-soft); color: var(--primary); list-style: none; }
+.edit-btn::-webkit-details-marker { display: none; }
+.edit-btn:hover { background: var(--primary-ring); }
+.deactivate-btn { background: var(--danger-bg); color: var(--danger); }
+.activate-btn { background: var(--success-bg); color: var(--success); }
+.deactivate-btn:hover, .activate-btn:hover { filter: brightness(0.95); }
 
-.edit-btn {
-    background: #e8efff;
-    color: #2456c5;
-    list-style: none;
-}
-
-.edit-btn::-webkit-details-marker {
-    display: none;
-}
-
-.deactivate-btn {
-    background: #f8d7da;
-    color: #842029;
-}
-
-.activate-btn {
-    background: #d1e7dd;
-    color: #0f5132;
-}
-
-.deactivate-btn:hover {
-    background: #f1c4c8;
-}
-
-.activate-btn:hover {
-    background: #b8dccc;
-}
-
-.status-form {
-    display: inline-block;
-    margin-left: 5px;
-}
-
+/* the edit box opens inline (no clipping inside the scrolling table) */
 .edit-form {
-    position: absolute;
-    z-index: 5;
-    width: min(320px, 85vw);
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    box-shadow: 0 5px 18px rgba(0,0,0,0.12);
-    padding: 16px;
+    position: static;
+    width: min(300px, 80vw);
     margin-top: 8px;
+    padding: 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
     white-space: normal;
 }
-
-.edit-form label {
-    display: block;
-    font-size: 13px;
-    font-weight: bold;
-    margin: 10px 0 6px;
-}
-
-.edit-form input,
-.edit-form textarea {
+.edit-form label { display: block; font-size: 13px; font-weight: 700; margin: 10px 0 6px; color: var(--muted); }
+.edit-form input, .edit-form textarea {
     width: 100%;
     padding: 10px;
-    border: 1px solid #aaa;
-    border-radius: 6px;
-    font-family: Arial, Helvetica, sans-serif;
+    border: 1px solid var(--input-border);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
     font-size: 13px;
 }
+.edit-form .save-program-btn { width: 100%; margin-top: 14px; }
 
-.edit-form input:focus,
-.edit-form textarea:focus {
-    outline: none;
-    border-color: #555;
+.program-count { margin-top: 15px; color: var(--muted); font-size: 12px; }
+
+/* programs table -> stacked cards on small screens (no sideways scrolling) */
+@media (max-width: 700px) {
+    .program-table, .program-table tbody { display: block; width: 100%; min-width: 0; }
+    .program-table thead { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0, 0, 0, 0); border: 0; }
+    .program-table tbody tr { display: block; margin-bottom: 14px; padding: 14px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
+    .program-table tbody tr:hover { background: var(--surface); }
+    .program-table td { display: block; padding: 4px 0; border-bottom: 0; }
+    .program-table td:first-child { font-size: 16px; }
+    .program-description { max-width: none; }
+    .program-table td.program-actions { min-width: 0; margin-top: 8px; padding-top: 12px; border-top: 1px solid var(--border); white-space: normal; }
+    .program-actions .edit-program, .program-actions .status-form { display: inline-block; margin: 0 6px 6px 0; }
+    .edit-form { width: 100%; max-width: 320px; }
 }
 
-.edit-form .save-program-btn {
-    width: 100%;
-    margin-top: 14px;
-}
-
-.program-count {
-    margin-top: 15px;
-    color: #777;
-    font-size: 12px;
-}
 @media (max-width: 600px) {
-
-    .programs-header {
-        align-items: flex-start;
-        flex-direction: column;
-    }
-
-    .programs-header button {
-        width: 100%;
-    }
-
-    .program-search .search-input {
-        width: 100%;
-    }
-
-    .program-actions {
-        min-width: 180px;
-    }
-
+    .programs-panel { padding: 16px; }
+    .programs-header { align-items: stretch; flex-direction: column; }
+    .programs-header button { width: 100%; }
+    .program-search .search-input { width: 100%; }
+    .program-actions { min-width: 180px; }
 }

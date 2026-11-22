@@ -26,6 +26,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>Add Worker</title>
 	<link rel="stylesheet" href="../theme.css">
+	<script src="sidebar.js" defer></script>
 </head>
 <body>
 	<div class="dashboard">

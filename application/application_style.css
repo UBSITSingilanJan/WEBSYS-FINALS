@@ -1,173 +1,59 @@
+/* ============================================================
+   application_style.css
+   Resident registration, aid application and the resident
+   profile fields. Connected to the shared theme (theme.css).
+   ============================================================ */
+@import url("../theme.css");
 
-/* APPLICATION PAGE */
+/* ---------- standalone form pages (register.php, application/index.php) ---------- */
+.resident-form-body { display: block; min-height: 100vh; background: var(--bg); color: var(--text); }
 
-.application-panel {
-    width: 100%;
-    padding: 28px;
-}
+.resident-form-page { width: min(100% - 32px, 980px); margin: 36px auto; }
 
-.application-heading {
-    margin-bottom: 28px;
-}
+.resident-form-header { margin-bottom: 22px; text-align: center; }
 
-.application-heading h3 {
-    font-size: 23px;
-    margin-bottom: 7px;
-}
-
-.application-heading p {
-    color: #777;
-    font-size: 14px;
-}
-
-.application-panel .form-group {
-    margin-bottom: 20px;
-}
-
-.application-panel .form-group label {
-    display: block;
-    font-size: 14px;
-    font-weight: 600;
-    margin-bottom: 9px;
-}
-
-.application-panel .form-control {
-    width: 100%;
-    height: 57px;
-    padding: 15px 18px;
-    border: 1px solid #aaa;
-    border-radius: 8px;
-    background-color: white;
-    font-size: 15px;
-    color: #333;
-    outline: none;
-}
-
-.application-panel .form-control:focus {
-    border-color: #555;
-}
-
-.application-panel select.form-control {
-    cursor: pointer;
-}
-
-.application-actions {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 12px;
-    margin-top: 28px;
-}
-
-.application-actions .btn-primary,
-.application-actions .btn-secondary {
-    min-height: 50px;
-    padding: 14px 22px;
-    font-size: 14px;
-    font-weight: bold;
-    border-radius: 7px;
-}
-
-.application-actions .btn-primary:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-.application-error {
-    padding: 13px 16px;
-    margin-bottom: 20px;
-    border: 1px solid #f5c2c7;
-    border-radius: 7px;
-    background: #f8d7da;
-    color: #842029;
-    font-size: 14px;
-}
-
-.no-program-message {
-    margin-top: 9px;
-    color: #842029;
+.resident-form-kicker {
+    margin-bottom: 8px;
+    color: var(--primary);
     font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
 }
 
-.page-subtitle {
-    margin-top: 6px;
-    color: #777;
-    font-size: 14px;
+.resident-form-header h1 { margin: 0 0 8px; color: var(--primary); font-size: clamp(24px, 4vw, 34px); line-height: 1.2; }
+.resident-form-header > p:last-child { margin: 0; color: var(--muted); line-height: 1.5; }
+
+.resident-form-card {
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-top: 5px solid var(--primary);
+    border-radius: 12px;
+    background: var(--surface);
+    box-shadow: var(--shadow);
 }
 
-.application-create {
-    margin-top: 8px;
-    padding: 22px;
-    border: 1px solid #d5d5d5;
-    border-radius: 9px;
-    background: #f9fafb;
-}
-
-.application-create .application-heading {
-    margin-bottom: 16px;
-}
-
-.application-create .application-heading h3 {
-    font-size: 18px;
-}
-
-.application-create-toggle {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    margin-bottom: 18px;
-    color: #263248;
-    font-size: 14px;
-    font-weight: 600;
-}
-
-.application-create-toggle input,
-.application-choice-list input {
-    width: auto;
-    margin-top: 2px;
-    accent-color: #2563eb;
-}
-
-.application-fields[hidden] {
-    display: none;
-}
-
+/* ---------- form sections ---------- */
 .application-form-section {
-    margin-top: 16px;
+    margin-top: 12px;
     padding: 18px;
-    border: 1px solid #e1e5eb;
-    border-radius: 8px;
-    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
 }
+.application-form-section:first-child { margin-top: 0; }
+.application-form-section h4 { margin-bottom: 14px; color: var(--primary); font-size: 15px; }
+.application-form-section summary { color: var(--primary); font-size: 14px; font-weight: 600; cursor: pointer; }
+.application-form-section summary + .application-fields-grid { margin-top: 16px; }
 
-.application-form-section h4 {
-    margin-bottom: 14px;
-    color: #263248;
-    font-size: 15px;
-}
-
-.application-form-section summary {
-    color: #263248;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-.application-form-section summary + .application-fields-grid {
-    margin-top: 16px;
-}
-
-.application-fields-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 14px;
-}
+.application-fields-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
 
 .application-fields-grid label {
     display: flex;
     flex-direction: column;
     gap: 6px;
-    color: #475467;
+    min-width: 0;
+    color: var(--muted);
     font-size: 13px;
     font-weight: 600;
 }
@@ -177,205 +63,94 @@
     height: auto;
     min-height: 42px;
     padding: 10px 12px;
-    border: 1px solid #cbd2dc;
-    border-radius: 6px;
-    background: #fff;
+    border: 1px solid var(--input-border);
+    border-radius: var(--radius-sm);
+    background: var(--input-bg);
+    color: var(--text);
     font: inherit;
     font-weight: 400;
 }
 
-.application-fields-grid textarea.form-control {
-    resize: vertical;
+.application-fields-grid .form-control:focus {
+    background: var(--surface);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-ring);
+    outline: none;
 }
 
-.application-label {
-    display: block;
-    margin-bottom: 8px;
-    color: #475467;
-    font-size: 13px;
-    font-weight: 600;
-}
+.application-fields-grid textarea.form-control { resize: vertical; min-height: 84px; }
+.application-fields-grid select.form-control { cursor: pointer; }
+.application-full { grid-column: 1 / -1; }
 
-.application-choice-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 9px 16px;
-}
+.application-label { display: block; margin-bottom: 8px; color: var(--muted); font-size: 13px; font-weight: 600; }
+.application-help { margin-bottom: 12px; color: var(--muted); font-size: 13px; line-height: 1.5; }
 
-.application-choice-list label {
-    display: inline-flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 4px;
-    color: #475467;
-    font-size: 13px;
-    font-weight: 400;
-}
-
-.application-help {
-    margin-bottom: 12px;
-    color: #667085;
-    font-size: 13px;
-    line-height: 1.5;
-}
+.application-choice-list { display: flex; flex-wrap: wrap; gap: 9px 18px; }
+.application-choice-list label { display: inline-flex; flex-direction: row; align-items: center; gap: 6px; color: var(--text); font-size: 13px; font-weight: 400; }
+.application-create-toggle input, .application-choice-list input { width: auto; margin-top: 0; accent-color: var(--primary); }
 
 .application-file {
     max-width: 100%;
     padding: 10px;
-    border: 1px dashed #98a2b3;
-    border-radius: 6px;
-    background: #f9fafb;
-    color: #475467;
-    font: inherit;
+    border: 1px dashed var(--input-border);
+    border-radius: var(--radius-sm);
+    background: var(--surface-alt);
+    color: var(--muted);
 }
-
-.application-full {
-    grid-column: 1 / -1;
-}
-
-.resident-form-body {
-    display: block;
-    min-height: 100vh;
-    margin: 0;
-    background: #f2f5f9;
-    color: #263248;
-    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-}
-
-.resident-form-page {
-    width: min(100% - 32px, 980px);
-    margin: 36px auto;
-}
-
-.resident-form-header {
-    margin-bottom: 22px;
-    text-align: center;
-}
-
-.resident-form-kicker {
-    margin-bottom: 8px;
-    color: #2563a6;
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-}
-
-.resident-form-header h1 {
-    margin: 0 0 8px;
-    color: #173b63;
-    font-size: clamp(24px, 4vw, 34px);
-}
-
-.resident-form-header > p:last-child {
-    margin: 0;
-    color: #667085;
-    line-height: 1.5;
-}
-
-.resident-form-card {
-    padding: 10px;
-    border: 1px solid #e1e5eb;
-    border-radius: 12px;
-    background: #fff;
-    box-shadow: 0 10px 28px rgba(31, 45, 61, 0.08);
-}
-
-.application-form-section {
-    margin-top: 12px;
-}
-
-.application-form-section:first-child {
-    margin-top: 0;
-}
-
-.application-fields-grid .form-control:focus {
-    border-color: #2563a6;
-    box-shadow: 0 0 0 3px rgba(37, 99, 166, 0.12);
-    outline: none;
-}
-
-.application-fields-grid textarea.form-control {
-    min-height: 42px;
-}
-
-.application-choice-list input {
-    width: auto;
-}
-
-.application-actions .btn-primary,
-.application-actions .btn-secondary {
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
-    border: 1px solid #1d4f7a;
-    text-decoration: none;
+.application-file::file-selector-button {
+    margin-right: 12px;
+    padding: 7px 12px;
+    border: 0;
+    border-radius: var(--radius-sm);
+    background: var(--primary);
+    color: var(--on-primary);
+    font-weight: 600;
     cursor: pointer;
 }
 
-.application-actions .btn-primary {
-    background: #1d4f7a;
-    color: #fff;
+.application-fields[hidden] { display: none; }
+
+/* ---------- optional "create application" box (Manage Residents) ---------- */
+.application-create {
+    margin-top: 8px;
+    padding: 22px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface-alt);
+}
+.application-create .application-heading { margin-bottom: 16px; }
+.application-create .application-heading h3 { margin: 0 0 6px; color: var(--primary); font-size: 18px; }
+.application-create .application-heading p, .application-heading p { color: var(--muted); font-size: 14px; }
+.application-create-toggle { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 18px; font-size: 14px; font-weight: 600; }
+
+/* ---------- messages and actions ---------- */
+.application-error {
+    padding: 13px 16px;
+    margin: 0 0 20px;
+    border: 1px solid var(--danger);
+    border-radius: var(--radius);
+    background: var(--danger-bg);
+    color: var(--danger);
+    font-size: 14px;
+}
+.no-program-message { margin-top: 9px; color: var(--danger); font-size: 13px; }
+
+.application-actions { display: flex; justify-content: flex-end; align-items: center; gap: 12px; margin: 16px 6px 6px; }
+.application-actions .btn-primary, .application-actions .btn-secondary {
+    min-height: 46px;
+    padding: 12px 22px;
+    font-size: 14px;
+    font-weight: 700;
+    border-radius: var(--radius);
 }
 
-.application-actions .btn-primary:hover:not(:disabled) {
-    background: #153b5c;
-}
-
-.application-actions .btn-secondary {
-    background: #fff;
-    color: #1d4f7a;
-}
-
-.application-actions .btn-secondary:hover {
-    background: #f2f5f9;
-}
-
-/* RESPONSIVE DESIGN */
-
-@media (max-width: 900px) {
-    .application-panel {
-        padding: 22px;
-    }
-}
-
-@media (max-width: 600px) {
-    .application-panel {
-        padding: 18px;
-    }
-
-    .application-heading h3 {
-        font-size: 19px;
-    }
-
-    .application-panel .form-control {
-        height: 50px;
-    }
-
-    .application-actions {
-        flex-direction: column-reverse;
-        align-items: stretch;
-    }
-
-    .application-actions .btn-primary,
-    .application-actions .btn-secondary {
-        width: 100%;
-        text-align: center;
-    }
-
-    .application-create {
-        padding: 16px;
-    }
-
-    .application-form-section {
-        padding: 14px;
-    }
-
-    .application-fields-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .application-full {
-        grid-column: auto;
-    }
+/* ---------- responsive ---------- */
+@media (max-width: 720px) {
+    .resident-form-page { margin: 22px auto; }
+    .application-fields-grid { grid-template-columns: minmax(0, 1fr); }
+    .application-full { grid-column: auto; }
+    .application-form-section { padding: 14px; }
+    .application-create { padding: 16px; }
+    .application-actions { flex-direction: column-reverse; align-items: stretch; }
+    .application-actions .btn-primary, .application-actions .btn-secondary { width: 100%; }
 }

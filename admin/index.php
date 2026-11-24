@@ -26,6 +26,7 @@
 
     <title>Admin Dashboard</title>
     <link rel="stylesheet" href="../theme.css">
+    <script src="sidebar.js" defer></script>
 </head>
 
 <body>

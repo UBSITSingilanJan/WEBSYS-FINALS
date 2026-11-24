@@ -102,6 +102,12 @@ $profileChecked = function ($field, $value) use ($profileSelections) {
         <label>Barangay *
             <input class="form-control" type="text" name="barangay" maxlength="100" value="<?= $profileValue('barangay') ?>" required>
         </label>
+        <label>Date moved into this barangay *
+            <input class="form-control" type="date" name="move_in_date" max="<?= date('Y-m-d') ?>" value="<?= $profileValue('move_in_date') ?>" <?= !empty($requireAidProfileFields) ? 'readonly' : '' ?> required>
+            <?php if (!empty($requireAidProfileFields)): ?>
+                <span class="application-help">This date is used to assess your six-month residency requirement.</span>
+            <?php endif; ?>
+        </label>
         <label>City / municipality *
             <input class="form-control" type="text" name="city" maxlength="100" value="<?= $profileValue('city') ?>" required>
         </label>

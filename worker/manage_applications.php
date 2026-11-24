@@ -14,6 +14,7 @@ if (
 require_once "../dbconn.php";
 require_once "../classes/application_manager.php";
 require_once "../classes/resident.php";
+require_once "../classes/resident_profile.php";
 
 $manager = new ApplicationManager($pdo);
 $residentManager = new Resident($pdo);
@@ -355,17 +356,18 @@ unset($_SESSION['flash']);
                 <table class="applicant-table management-table">
 
                     <colgroup>
-                        <col style="width: 12%">
+                        <col style="width: 10%">
+                        <col style="width: 7%">
+                        <col style="width: 10%">
+                        <col style="width: 11%">
+                        <col style="width: 7%">
+                        <col style="width: 6%">
                         <col style="width: 8%">
-                        <col style="width: 12%">
-                        <col style="width: 7%">
-                        <col style="width: 7%">
+                        <col style="width: 8%">
+                        <col style="width: 9%">
+                        <col style="width: 6%">
                         <col style="width: 9%">
                         <col style="width: 9%">
-                        <col style="width: 9%">
-                        <col style="width: 7%">
-                        <col style="width: 10%">
-                        <col style="width: 10%">
                     </colgroup>
 
                     <thead>
@@ -375,6 +377,7 @@ unset($_SESSION['flash']);
                             <th scope="col">Applicant</th>
                             <th scope="col">Application Date</th>
                             <th scope="col">Email</th>
+                            <th scope="col">Residency Assessment</th>
                             <th scope="col">Program</th>
                             <th scope="col">Status</th>
                             <th scope="col">Submitted Documents</th>
@@ -419,6 +422,8 @@ unset($_SESSION['flash']);
                                 }
 
                                 $documents = $applicationDocuments[(int)$applicant['applicant_id']] ?? [];
+                                $eligibilityDate = ResidentProfile::aid_eligibility_date($applicant['move_in_date'] ?? null);
+                                $isFullResident = $eligibilityDate !== null && $eligibilityDate <= new DateTimeImmutable('today');
 
                                 $releaseDate = $hasRelease
                                     ? $applicant['latest_release_date']
@@ -467,6 +472,18 @@ unset($_SESSION['flash']);
 
                                         <?php echo e($applicant['email']); ?>
 
+                                    </td>
+
+                                    <td data-label="Residency Assessment">
+                                        <?php if ($eligibilityDate === null) { ?>
+                                            Move-in date not recorded
+                                        <?php } elseif ($isFullResident) { ?>
+                                            Full resident
+                                            <small>Since <?php echo e($eligibilityDate->format('M j, Y')); ?></small>
+                                        <?php } else { ?>
+                                            Under assessment
+                                            <small>Eligible <?php echo e($eligibilityDate->format('M j, Y')); ?></small>
+                                        <?php } ?>
                                     </td>
 
 
@@ -807,7 +824,7 @@ unset($_SESSION['flash']);
 
                             <tr>
 
-                                <td colspan="11" class="empty-message">
+                                <td colspan="12" class="empty-message">
                                     No applicants found.
                                 </td>
 

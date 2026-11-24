@@ -33,7 +33,7 @@
             }));
             $fields = [
                 'firstname', 'middlename', 'lastname', 'suffix', 'nickname',
-                'birthdate', 'age', 'gender', 'civilstatus', 'contact', 'email',
+                'birthdate', 'move_in_date', 'age', 'gender', 'civilstatus', 'contact', 'email',
                 'housenumber', 'street', 'barangay', 'city', 'province', 'zipcode',
                 'address', 'birthplace', 'occupation', 'monthly_income', 'education',
                 'course', 'talents', 'marketable_skills', 'health_condition',

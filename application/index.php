@@ -28,11 +28,13 @@ if (!$row) {
     exit("Please complete your resident profile before applying.");
 }
 
+$eligibilityDate = ResidentProfile::aid_eligibility_date($row['move_in_date'] ?? null);
+$isAidEligible = $eligibilityDate !== null && $eligibilityDate <= new DateTimeImmutable('today');
 $uploadError = null;
 $profileValues = $row;
 $aidType = '';
 
-if (isset($_POST['apply_btn'])) {
+if (isset($_POST['apply_btn']) && $isAidEligible) {
     $profileResult = ResidentProfile::from_post($_POST);
     $profileValues = array_merge($_POST, $profileResult['data']);
     $aidType = is_string($_POST['aid_type'] ?? null) ? trim($_POST['aid_type']) : '';
@@ -177,6 +179,20 @@ if (isset($_POST['apply_btn'])) {
         <p class="application-error" role="alert"><?= htmlspecialchars($uploadError, ENT_QUOTES, 'UTF-8') ?></p>
     <?php endif; ?>
 
+    <?php if (!$isAidEligible): ?>
+        <p class="application-error" role="status">
+            <?php if ($eligibilityDate === null): ?>
+                Your move-in date is not recorded. Contact the barangay office to update your resident record before applying.
+            <?php else: ?>
+                Your account is under residency assessment. You can apply for aid after six months, on <?= htmlspecialchars($eligibilityDate->format('F j, Y'), ENT_QUOTES, 'UTF-8') ?>.
+            <?php endif; ?>
+        </p>
+    <?php else: ?>
+        <p class="application-help" role="status">
+            You meet the six-month residency requirement and are eligible to apply for aid.
+        </p>
+    <?php endif; ?>
+
     <form class="resident-form-card" method="post" enctype="multipart/form-data">
         <section class="application-form-section" aria-labelledby="account-heading">
             <h4 id="account-heading">Resident Account</h4>
@@ -214,7 +230,7 @@ if (isset($_POST['apply_btn'])) {
 
         <div class="application-actions">
             <a class="btn-secondary" href="../resident/index.php">Cancel</a>
-            <button class="btn-primary" type="submit" name="apply_btn" <?= empty($activePrograms) ? 'disabled' : '' ?>>Submit Application</button>
+            <button class="btn-primary" type="submit" name="apply_btn" <?= empty($activePrograms) || !$isAidEligible ? 'disabled' : '' ?>>Submit Application</button>
         </div>
     </form>
 </main>

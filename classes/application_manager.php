@@ -239,6 +239,7 @@ class ApplicationManager {
                     a.application_date,
                     a.aid_type,
                     a.status,
+                    ri.move_in_date,
 
                     (
                         SELECT COUNT(*)
@@ -328,7 +329,10 @@ class ApplicationManager {
                         LIMIT 1
                     ) AS latest_release_remarks
 
-                FROM application a";
+                FROM application a
+                LEFT JOIN resident_information ri
+                    ON ri.resident_id = a.resident_id
+                    OR (a.resident_id IS NULL AND ri.user_id = a.user_id)";
 
         $params = [];
 

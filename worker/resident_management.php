@@ -141,6 +141,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save'
                     $error = 'Select an active assistance program.';
                 }
 
+                $eligibilityDate = ResidentProfile::aid_eligibility_date($resident['move_in_date'] ?? null);
+                if ($error === '' && ($eligibilityDate === null || $eligibilityDate > new DateTimeImmutable('today'))) {
+                    $error = $eligibilityDate === null
+                        ? 'Enter a valid move-in date before creating an aid application.'
+                        : 'This resident can apply for financial aid after six months of residency, on ' . $eligibilityDate->format('F j, Y') . '.';
+                }
+
                 if ($error === '' && strlen($applicationData['aid_type']) > 150) {
                     $error = 'Select a valid assistance program.';
                 }

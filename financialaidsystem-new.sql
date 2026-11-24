@@ -268,6 +268,7 @@ ALTER TABLE `resident_information`
   ADD COLUMN `zipcode` varchar(20) DEFAULT NULL,
   ADD COLUMN `nickname` varchar(100) DEFAULT NULL,
   ADD COLUMN `birthdate` date DEFAULT NULL,
+  ADD COLUMN `move_in_date` date DEFAULT NULL,
   ADD COLUMN `civilstatus` varchar(50) DEFAULT NULL,
   ADD COLUMN `birthplace` varchar(100) DEFAULT NULL,
   ADD COLUMN `occupation` varchar(100) DEFAULT NULL,

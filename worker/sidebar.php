@@ -5,7 +5,6 @@ $navigation = [
     'residents' => ['resident_management.php', 'Manage Residents'],
     'applications' => ['manage_applications.php', 'Manage Applications'],
     'programs' => ['manage_programs.php', 'Manage Programs'],
-    'search' => ['search.php', 'Search Residents'],
     'distributions' => ['distributions.php', 'Distributions'],
     'logout' => ['logout.php', 'Logout'],
 ];

@@ -9,6 +9,7 @@ class ResidentProfile
         $fields = [
             'firstname' => 100, 'middlename' => 100, 'lastname' => 100,
             'suffix' => 20, 'nickname' => 100, 'birthdate' => 10,
+            'move_in_date' => 10,
             'gender' => 10, 'civilstatus' => 50, 'contact' => 11,
             'housenumber' => 50, 'street' => 100, 'barangay' => 100,
             'city' => 100, 'province' => 100, 'zipcode' => 20,
@@ -77,6 +78,15 @@ class ResidentProfile
             return ['data' => $data, 'error' => 'Enter a valid date of birth.'];
         }
 
+        $moveInDate = DateTime::createFromFormat('!Y-m-d', $data['move_in_date']);
+        if (
+            !$moveInDate ||
+            $moveInDate->format('Y-m-d') !== $data['move_in_date'] ||
+            $moveInDate > new DateTime('today')
+        ) {
+            return ['data' => $data, 'error' => 'Enter a valid date moved into the barangay.'];
+        }
+
         if ($data['monthly_income'] !== '') {
             if (!is_numeric($data['monthly_income']) || (float)$data['monthly_income'] < 0 || (float)$data['monthly_income'] > 9999999999.99) {
                 return ['data' => $data, 'error' => 'Enter a valid monthly income.'];
@@ -99,5 +109,30 @@ class ResidentProfile
         }
 
         return ['data' => $data, 'error' => null];
+    }
+
+    public static function aid_eligibility_date($moveInDate)
+    {
+        if (!is_string($moveInDate)) {
+            return null;
+        }
+
+        $date = DateTimeImmutable::createFromFormat('!Y-m-d', $moveInDate);
+        if (
+            !$date ||
+            $date->format('Y-m-d') !== $moveInDate ||
+            $date > new DateTimeImmutable('today')
+        ) {
+            return null;
+        }
+
+        $eligibilityMonth = $date->modify('first day of this month')->modify('+6 months');
+        $day = min((int)$date->format('j'), (int)$eligibilityMonth->format('t'));
+
+        return $eligibilityMonth->setDate(
+            (int)$eligibilityMonth->format('Y'),
+            (int)$eligibilityMonth->format('n'),
+            $day
+        );
     }
 }

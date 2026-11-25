@@ -127,9 +127,6 @@ class ApplicationManager {
         return $update->rowCount() === 1;
     }
 
-    /*
-     * CREATE FIRST RELEASE
-     */
     public function record_release($applicant_id, $amount, $release_date, $remarks) {
 
         $validation = $this->validate_release_input($amount, $release_date);
@@ -164,9 +161,6 @@ class ApplicationManager {
         ];
     }
 
-    /*
-     * UPDATE AN EXISTING RELEASE
-     */
     public function update_release($release_id, $applicant_id, $amount, $release_date, $remarks) {
 
         $validation = $this->validate_release_input($amount, $release_date);
@@ -223,10 +217,7 @@ class ApplicationManager {
             "message" => "Assistance release updated successfully."
         ];
     }
-
-    /*
-     * FETCH APPLICATIONS AND THEIR LATEST RELEASE
-     */
+    
     public function fetch_applications($search = "") {
 
         $sql = "SELECT

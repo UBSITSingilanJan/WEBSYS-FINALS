@@ -1,8 +1,3 @@
-/* ============================================================
-   application_style.css
-   Resident registration, aid application and the resident
-   profile fields. Connected to the shared theme (theme.css).
-   ============================================================ */
 @import url("../theme.css");
 
 /* ---------- standalone form pages (register.php, application/index.php) ---------- */

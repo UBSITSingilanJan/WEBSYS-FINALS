@@ -150,21 +150,10 @@ $profileChecked = function ($field, $value) use ($profileSelections) {
 </section>
 
 <section class="application-form-section" aria-labelledby="health-heading">
-    <h4 id="health-heading">Health and Transportation</h4>
+    <h4 id="health-heading">Health Information</h4>
     <div class="application-fields-grid">
         <label>Health conditions (if any)
             <textarea class="form-control" name="health_condition" rows="3" maxlength="2000" placeholder="List any conditions or enter None"><?= $profileValue('health_condition') ?></textarea>
-        </label>
-        <label>Mode of transportation
-            <select class="form-control" name="transport_mode">
-                <option value="">Select mode</option>
-                <?php foreach (['Public transportation', 'Personal vehicle', 'Company service', 'Walking', 'Other'] as $option): ?>
-                    <option value="<?= $option ?>" <?= ($profileValues['transport_mode'] ?? '') === $option ? 'selected' : '' ?>><?= $option ?></option>
-                <?php endforeach; ?>
-            </select>
-        </label>
-        <label class="application-full">Vehicle / transportation details
-            <input class="form-control" type="text" name="transport_details" maxlength="255" value="<?= $profileValue('transport_details') ?>">
         </label>
     </div>
 </section>

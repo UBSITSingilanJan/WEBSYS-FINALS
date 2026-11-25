@@ -1,6 +1,0 @@
-/* ============================================================
-   resident_style.css  -  kept for compatibility.
-   All resident styling now lives in ../theme.css; this file simply
-   connects to it so any page still linking it matches the theme.
-   ============================================================ */
-@import url("../theme.css");

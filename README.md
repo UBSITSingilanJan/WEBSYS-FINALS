@@ -2,7 +2,7 @@
 
 ## Resident management and applications
 
-For a fresh installation, import `financialaidsystem-new.sql`. For an existing installation, back up the database and run `migrations/add_resident_application_relationship.sql`, `migrations/allow_applications_without_email.sql`, `migrations/expand_resident_profile.sql`, and `migrations/add_resident_move_in_date.sql` once each. Existing resident records need their verified move-in date entered through **Manage Residents**. Resident self-registration and worker-created resident records capture the date they moved into the barangay. Residents become eligible to apply for financial aid after six months; online and worker-created applications are blocked before that date.
+For a fresh installation, import `financialaidsystem-v4.sql`. For an existing installation, back up the database and run `migrations/add_resident_application_relationship.sql`, `migrations/allow_applications_without_email.sql`, `migrations/expand_resident_profile.sql`, and `migrations/add_resident_move_in_date.sql` once each. Existing resident records need their verified move-in date entered through **Manage Residents**. Resident self-registration and worker-created resident records capture the date they moved into the barangay. Residents become eligible to apply for financial aid after six months; online and worker-created applications are blocked before that date.
 
 ## Project structure
 

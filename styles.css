@@ -1,6 +1,0 @@
-/* ============================================================
-   styles.css  -  kept for compatibility.
-   Not used by any page directly any more; it just loads the
-   shared theme so anything that still links it matches.
-   ============================================================ */
-@import url("theme.css");

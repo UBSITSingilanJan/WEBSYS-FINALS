@@ -1,7 +1,21 @@
 @import url("../theme.css");
 
+/* ---------- standalone form pages (register.php, application/index.php) ---------- */
+html.resident-application-document {
+    height: auto;
+    min-height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
 
-.resident-form-body { display: block; min-height: 100vh; background: var(--bg); color: var(--text); }
+.resident-form-body {
+    display: block;
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+    background: var(--bg);
+    color: var(--text);
+}
 
 .resident-form-page { width: min(100% - 32px, 980px); margin: 36px auto; }
 

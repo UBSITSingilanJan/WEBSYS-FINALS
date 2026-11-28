@@ -80,11 +80,12 @@ $activePrograms = $programManager->fetch_active_programs();
             </section>
         </div>
 
-        <div class="content-grid">
+        <div class="resident-dashboard-content">
 
-            <section class="panel">
+            <section class="resident-dashboard">
 
                 <h3>My Applications</h3>
+                <div class="resident-dashboard-list">
 
                 <?php if (!empty($applications)) { ?>
 
@@ -156,6 +157,7 @@ $activePrograms = $programManager->fetch_active_programs();
                     </div>
 
                 <?php } ?>
+                </div>
 
             </section>
 

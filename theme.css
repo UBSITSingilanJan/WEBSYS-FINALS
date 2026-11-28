@@ -501,6 +501,31 @@ input[readonly].form-control, input[readonly] { cursor: default; }
 .form-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 12px; margin-top: 20px; }
 .form-btn { padding: 10px 20px; font-size: 14px; }
 
+.resident-profile-content { display: grid; grid-template-columns: minmax(0, 1fr); }
+.resident-profile-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px; }
+.resident-profile-column { min-width: 0; }
+.resident-profile-address-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.resident-profile-address-grid .form-control { min-width: 0; }
+
+.resident-dashboard-content { width: 100%; }
+.resident-dashboard > h3 { margin: 0 0 16px; color: var(--primary); font-size: 17px; font-weight: 700; }
+.resident-dashboard-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 320px));
+    align-items: start;
+    gap: 16px;
+}
+.resident-dashboard-list .application-item {
+    min-width: 0;
+    padding: 16px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+}
+.resident-dashboard-list .application-item h4 { margin: 0 0 8px; color: var(--primary); }
+.resident-dashboard-list .application-item p { margin: 0 0 8px; overflow-wrap: anywhere; }
+.resident-dashboard-content .empty-message { padding: 12px 0; }
+
 .alert-message {
     background: var(--primary-soft);
     color: var(--primary);
@@ -668,6 +693,7 @@ html body:has(.login-card) { background: var(--bg); overflow-y: auto; }
 
 @media (max-width: 900px) {
     :root { --sidebar-w: min(285px, 84vw); --gutter: 18px; --gutter-top: 14px; }
+    .resident-profile-grid { grid-template-columns: 1fr; gap: 0; }
 
     .dashboard { display: block; height: auto; min-height: 100vh; min-height: 100dvh; overflow: visible; }
     .main-content { overflow: visible; padding-bottom: 28px; min-height: 100vh; min-height: 100dvh; }

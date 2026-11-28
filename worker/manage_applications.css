@@ -1,0 +1,9 @@
+
+@import url("../theme.css");
+
+.release-history-panel { margin-top: 20px; }
+
+
+@media (min-width: 1100px) {
+    .stats-container { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}

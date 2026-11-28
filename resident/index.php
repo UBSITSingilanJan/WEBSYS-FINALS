@@ -4,6 +4,7 @@ session_start();
 
 require_once "../dbconn.php";
 require_once "../classes/applicant.php";
+require_once "../classes/program_manager.php";
 
 if (!isset($_SESSION['user_id'])) {
     header("Location: ../index.php");
@@ -18,6 +19,11 @@ if (!empty($_SESSION['must_change_password'])) {
 $conn = new Applicant($pdo);
 
 $applications = $conn->fetch_resident_applications($_SESSION['user_id']);
+$approvedApplicationCount = count(array_filter($applications, function ($application) {
+    return strtolower((string)$application['status']) === 'approved';
+}));
+$programManager = new ProgramManager($pdo);
+$activePrograms = $programManager->fetch_active_programs();
 ?>
 
 <!DOCTYPE html>
@@ -55,6 +61,23 @@ $applications = $conn->fetch_resident_applications($_SESSION['user_id']);
 
         <div class="topbar">
             <h2>My Aid Application</h2>
+        </div>
+
+        <div class="stats-container">
+            <section class="stat-card">
+                <p>Total Applied Programs</p>
+                <h1><?php echo count($applications); ?></h1>
+            </section>
+
+            <section class="stat-card">
+                <p>Total Active Programs</p>
+                <h1><?php echo count($activePrograms); ?></h1>
+            </section>
+
+            <section class="stat-card">
+                <p>Approved Programs</p>
+                <h1><?php echo $approvedApplicationCount; ?></h1>
+            </section>
         </div>
 
         <div class="content-grid">

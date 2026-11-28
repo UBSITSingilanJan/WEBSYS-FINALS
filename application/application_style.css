@@ -1,0 +1,151 @@
+@import url("../theme.css");
+
+/* ---------- standalone form pages (register.php, application/index.php) ---------- */
+.resident-form-body { display: block; min-height: 100vh; background: var(--bg); color: var(--text); }
+
+.resident-form-page { width: min(100% - 32px, 980px); margin: 36px auto; }
+
+.resident-form-header { margin-bottom: 22px; text-align: center; }
+
+.resident-form-kicker {
+    margin-bottom: 8px;
+    color: var(--primary);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.resident-form-header h1 { margin: 0 0 8px; color: var(--primary); font-size: clamp(24px, 4vw, 34px); line-height: 1.2; }
+.resident-form-header > p:last-child { margin: 0; color: var(--muted); line-height: 1.5; }
+
+.resident-form-card {
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-top: 5px solid var(--primary);
+    border-radius: 12px;
+    background: var(--surface);
+    box-shadow: var(--shadow);
+}
+
+/* ---------- form sections ---------- */
+.application-form-section {
+    margin-top: 12px;
+    padding: 18px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+}
+.application-form-section:first-child { margin-top: 0; }
+.application-form-section h4 { margin-bottom: 14px; color: var(--primary); font-size: 15px; }
+.application-form-section summary { color: var(--primary); font-size: 14px; font-weight: 600; cursor: pointer; }
+.application-form-section summary + .application-fields-grid { margin-top: 16px; }
+
+.application-fields-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+
+.application-fields-grid label {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.application-fields-grid .form-control {
+    min-width: 0;
+    height: auto;
+    min-height: 42px;
+    padding: 10px 12px;
+    border: 1px solid var(--input-border);
+    border-radius: var(--radius-sm);
+    background: var(--input-bg);
+    color: var(--text);
+    font: inherit;
+    font-weight: 400;
+}
+
+.application-fields-grid .form-control:focus {
+    background: var(--surface);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-ring);
+    outline: none;
+}
+
+.application-fields-grid textarea.form-control { resize: vertical; min-height: 84px; }
+.application-fields-grid select.form-control { cursor: pointer; }
+.application-full { grid-column: 1 / -1; }
+
+.application-label { display: block; margin-bottom: 8px; color: var(--muted); font-size: 13px; font-weight: 600; }
+.application-help { margin-bottom: 12px; color: var(--muted); font-size: 13px; line-height: 1.5; }
+
+.application-choice-list { display: flex; flex-wrap: wrap; gap: 9px 18px; }
+.application-choice-list label { display: inline-flex; flex-direction: row; align-items: center; gap: 6px; color: var(--text); font-size: 13px; font-weight: 400; }
+.application-create-toggle input, .application-choice-list input { width: auto; margin-top: 0; accent-color: var(--primary); }
+
+.application-file {
+    max-width: 100%;
+    padding: 10px;
+    border: 1px dashed var(--input-border);
+    border-radius: var(--radius-sm);
+    background: var(--surface-alt);
+    color: var(--muted);
+}
+.application-file::file-selector-button {
+    margin-right: 12px;
+    padding: 7px 12px;
+    border: 0;
+    border-radius: var(--radius-sm);
+    background: var(--primary);
+    color: var(--on-primary);
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.application-fields[hidden] { display: none; }
+
+/* ---------- optional "create application" box (Manage Residents) ---------- */
+.application-create {
+    margin-top: 8px;
+    padding: 22px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface-alt);
+}
+.application-create .application-heading { margin-bottom: 16px; }
+.application-create .application-heading h3 { margin: 0 0 6px; color: var(--primary); font-size: 18px; }
+.application-create .application-heading p, .application-heading p { color: var(--muted); font-size: 14px; }
+.application-create-toggle { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 18px; font-size: 14px; font-weight: 600; }
+
+/* ---------- messages and actions ---------- */
+.application-error {
+    padding: 13px 16px;
+    margin: 0 0 20px;
+    border: 1px solid var(--danger);
+    border-radius: var(--radius);
+    background: var(--danger-bg);
+    color: var(--danger);
+    font-size: 14px;
+}
+.no-program-message { margin-top: 9px; color: var(--danger); font-size: 13px; }
+
+.application-actions { display: flex; justify-content: flex-end; align-items: center; gap: 12px; margin: 16px 6px 6px; }
+.application-actions .btn-primary, .application-actions .btn-secondary {
+    min-height: 46px;
+    padding: 12px 22px;
+    font-size: 14px;
+    font-weight: 700;
+    border-radius: var(--radius);
+}
+
+/* ---------- responsive ---------- */
+@media (max-width: 720px) {
+    .resident-form-page { margin: 22px auto; }
+    .application-fields-grid { grid-template-columns: minmax(0, 1fr); }
+    .application-full { grid-column: auto; }
+    .application-form-section { padding: 14px; }
+    .application-create { padding: 16px; }
+    .application-actions { flex-direction: column-reverse; align-items: stretch; }
+    .application-actions .btn-primary, .application-actions .btn-secondary { width: 100%; }
+}
